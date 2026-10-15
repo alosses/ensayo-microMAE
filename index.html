@@ -112,6 +112,23 @@ h2{font:800 24px/1.2 var(--display);margin:0;text-wrap:balance}
 .ls-sec p{margin:0;max-width:66ch}
 .ls-sec ul{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px;max-width:66ch}
 .formula{font:400 15px/1.6 var(--mono);background:var(--pen-soft);border-radius:8px;padding:10px 14px;overflow-x:auto}
+.part{border-radius:10px;padding:14px 16px;display:flex;flex-direction:column;gap:12px}
+.part-h{font:700 13px/1.3 var(--display);text-transform:uppercase;letter-spacing:.05em}
+.part.theory{background:var(--sheet);border:1px solid var(--line)}
+.part.theory .part-h{color:var(--pen)}
+.part.method{background:var(--pen-soft)}
+.part.method .part-h{color:var(--pen)}
+.part.method ol{margin:0;padding-left:22px;display:flex;flex-direction:column;gap:6px;max-width:66ch}
+.part.guide{background:var(--hint-soft);border-left:4px solid var(--hint)}
+.part.guide .part-h{color:var(--hint)}
+.part.guide p{margin:0;max-width:66ch}
+.formula{background:var(--paper)}
+.kind{border-radius:5px;padding:3px 7px}
+.k-teoria{background:var(--pen-soft);color:var(--pen)}
+.k-guia{background:var(--hint-soft);color:var(--hint)}
+.k-nuevo{background:var(--ok-soft);color:var(--ok)}
+.k-lectura{background:var(--grid);color:var(--muted)}
+.newv{display:inline-block;font:600 12px/1.4 var(--mono);text-transform:uppercase;letter-spacing:.05em;color:var(--ok);margin-right:4px}
 .recall{border:1px dashed var(--line);border-radius:10px;padding:8px 12px}
 .recall summary{cursor:pointer;font:600 14px/1.4 var(--body);color:var(--pen)}
 .recall summary:focus-visible{outline:3px solid var(--pen);outline-offset:2px}
@@ -126,7 +143,7 @@ h2{font:800 24px/1.2 var(--display);margin:0;text-wrap:balance}
   <header>
     <div class="eyebrow">Microeconomía Aplicada · MAE Weekend</div>
     <h1>Ensayo para el examen</h1>
-    <p class="sub">19 lecciones cortas y 30 preguntas en 3 bloques. Primero lees la materia, después respondes. Si fallas, recibes una pista y otra oportunidad. Al cerrar cada bloque ves qué repasar y dónde.</p>
+    <p class="sub">19 lecciones y 30 preguntas en 3 bloques. Cada lección separa la teoría de clase y el método general, que sirven con cualquier valor, de la aplicación concreta de la Guía 1. Algunas preguntas usan valores nuevos para que practiques el método. Si fallas, recibes una pista y otra oportunidad. Al cerrar cada bloque ves qué repasar y dónde.</p>
   </header>
 
   <div class="blocks" id="blocks"></div>
@@ -153,11 +170,11 @@ const Q = [
  hint:"En una Cobb-Douglas K<sup>a</sup>L<sup>b</sup>, PMgL/PMgK = (b/a)·(K/L). Aquí a = b = 1/2.",
  why:"(1/2)/(1/2) = 1, así que TMST<sub>X</sub> = K<sub>X</sub>/L<sub>X</sub>. Es proporcional a K/L, no constante.",
  topic:"TMST en Cobb-Douglas", src:"Guía de estudio, Bloque 1 paso 1 · Clase 1, lám. 21–27"},
-{q:"Con Y = K<sub>Y</sub><sup>1/4</sup> L<sub>Y</sub><sup>3/4</sup>, la TMST<sub>Y</sub> es:",
- o:["K<sub>Y</sub> / L<sub>Y</sub>","(1/3)·K<sub>Y</sub> / L<sub>Y</sub>","3·K<sub>Y</sub> / L<sub>Y</sub>","3·L<sub>Y</sub> / K<sub>Y</sub>"], a:2,
- hint:"Usa la misma regla: (exponente de L / exponente de K)·(K/L).",
- why:"(3/4)/(1/4) = 3, entonces TMST<sub>Y</sub> = 3·K<sub>Y</sub>/L<sub>Y</sub>. Fue uno de tus errores en la guía: la TMST no es igual a K/L, es proporcional.",
- topic:"TMST en Cobb-Douglas", src:"Bloque 1 paso 1 · P2.1"},
+{q:"<span class=\"newv\">Valores nuevos.</span> Si Y = K<sub>Y</sub><sup>0,4</sup> L<sub>Y</sub><sup>0,6</sup>, ¿cuál es la TMST<sub>Y</sub>?",
+ o:["K<sub>Y</sub> / L<sub>Y</sub>","1,5·K<sub>Y</sub> / L<sub>Y</sub>","(2/3)·K<sub>Y</sub> / L<sub>Y</sub>","0,6·K<sub>Y</sub> / L<sub>Y</sub>"], a:1,
+ hint:"Aplica el método: PMgL/PMgK = (exponente de L / exponente de K)·(K/L). ¿Cuánto es 0,6/0,4?",
+ why:"(0,6)/(0,4) = 1,5, así que TMST<sub>Y</sub> = 1,5·K<sub>Y</sub>/L<sub>Y</sub>. En la Guía 1 el factor era 3 porque los exponentes eran 1/4 y 3/4. El número cambia con los exponentes; el método no.",
+ topic:"TMST con otros exponentes", src:"Clase 1, lám. 21 y 27 · método de la lección"},
 {q:"¿Cuál es la forma correcta de probar que X es intensivo en capital <em>cualquiera sea</em> w/r?",
  o:["Mostrar que con w/r = 6, K<sub>X</sub>/L<sub>X</sub> = 6 y K<sub>Y</sub>/L<sub>Y</sub> = 2","Notar que K<sub>X</sub>/L<sub>X</sub> = w/r > (w/r)/3 = K<sub>Y</sub>/L<sub>Y</sub> para todo w/r > 0","Ver que X tiene exponentes iguales","Comprobar que la curva de contrato pasa por ambos orígenes"], a:1,
  hint:"Cuando el enunciado dice \"cualquiera sea\", un ejemplo numérico no basta. ¿Qué expresión vale para todo w/r?",
@@ -178,15 +195,15 @@ const Q = [
  hint:"Si se puede producir más de ambos bienes reasignando factores, ¿estás en la frontera?",
  why:"Si TMST<sub>X</sub> ≠ TMST<sub>Y</sub>, hay una reasignación que aumenta ambas producciones. Por eso el punto está dentro de la FPP. En tu guía, B había que dibujarlo dentro, no sobre la curva.",
  topic:"Curva de contrato y FPP", src:"Bloque 1 paso 6 · P2.3 · Clase 1, lám. 40"},
-{q:"Con p<sub>X</sub> = 2r<sup>1/2</sup>w<sup>1/2</sup> y p<sub>Y</sub> ∝ r<sup>1/4</sup>w<sup>3/4</sup>, si p<sub>X</sub> sube 10% y p<sub>Y</sub> no cambia:",
- o:["%Δw = +10% y %Δr = −30%","%Δw = −10% y %Δr = +30%","%Δw = +5% y %Δr = +5%","%Δw = −30% y %Δr = +10%"], a:1,
- hint:"Escribe %Δp = suma de participaciones × %Δ de cada factor. De la ecuación de Y (que no cambia) sale %Δr = −3·%Δw.",
- why:"0 = 0,25%Δr + 0,75%Δw da %Δr = −3%Δw. Luego 10 = 0,5(−3%Δw) + 0,5%Δw = −%Δw, así que %Δw = −10% y %Δr = +30%. Ojo con el signo: lo perdiste una vez en la guía.",
- topic:"Stolper–Samuelson en tasas de cambio", src:"Bloque 2 pasos 1–2 · P2.5"},
+{q:"<span class=\"newv\">Valores nuevos.</span> En X el capital pesa 0,6 en el costo y el trabajo 0,4; en Y el capital pesa 0,2 y el trabajo 0,8. Si p<sub>X</sub> sube 10% y p<sub>Y</sub> no cambia:",
+ o:["%Δw = −5% y %Δr = +20%","%Δw = +5% y %Δr = −20%","%Δw = −10% y %Δr = +30%","%Δw = −20% y %Δr = +5%"], a:0,
+ hint:"Parte por el bien cuyo precio no cambia: 0 = 0,2·%Δr + 0,8·%Δw. Eso te da %Δr en función de %Δw. Luego reemplaza en la ecuación de X.",
+ why:"De Y: %Δr = −4·%Δw. En X: 10 = 0,6(−4%Δw) + 0,4%Δw = −2%Δw, así que %Δw = −5% y %Δr = +20%. Los −10% y +30% de la Guía 1 salían de otras participaciones (0,5/0,5 y 0,25/0,75).",
+ topic:"Stolper–Samuelson con otras participaciones", src:"Clase 1, lám. 38–40 · método de la lección"},
 {q:"¿Qué ordenamiento muestra el efecto magnificación del caso anterior?",
  o:["%Δp<sub>X</sub> > %Δr > %Δw > %Δp<sub>Y</sub>","%Δr > %Δp<sub>X</sub> > %Δp<sub>Y</sub> > %Δw","%Δr = %Δp<sub>X</sub> > %Δw = %Δp<sub>Y</sub>","%Δw > %Δp<sub>Y</sub> > %Δp<sub>X</sub> > %Δr"], a:1,
  hint:"El precio del factor intensivo en el bien que sube se mueve más que el propio precio del bien.",
- why:"30% > 10% > 0% > −10%. El capital gana frente a ambos bienes y el trabajo pierde frente a ambos. Es un resultado del teorema, no una condición.",
+ why:"En el caso anterior: 20% > 10% > 0% > −5% (en la Guía 1 era 30% > 10% > 0% > −10%). El orden es siempre el mismo: el factor ganador sube más que ambos bienes y el perdedor baja más que ambos. Es un resultado del teorema, no una condición.",
  topic:"Efecto magnificación", src:"Bloque 2 paso 3 · Clase 1, lám. 38–39"},
 {q:"En el diagrama de iso-costo unitario (w en el eje horizontal, r en el vertical), ¿qué curva es más empinada?",
  o:["La del sector intensivo en capital","La del sector intensivo en trabajo","Ambas tienen la misma pendiente","Depende de los precios de los bienes"], a:1,
@@ -200,11 +217,11 @@ const Q = [
  topic:"Heckscher–Ohlin", src:"Bloque 2, H-O · Clase 1, lám. 41 · P3.2"},
 
 /* ---------- BLOQUE 2 ---------- */
-{q:"Con BT(Q) = −Q² + 15Q y costo de $3 por vaca, el planificador elige:",
- o:["Q = 7,5 y renta 56,25","Q = 6 y renta 36","Q = 12 y renta 0","Q = 6 y renta 54"], a:1,
- hint:"Maximiza la renta neta BN(Q) = BT(Q) − c·Q. Ojo: el costo total es c·Q, no c.",
- why:"BN = −Q² + 12Q, CPO −2Q + 12 = 0, Q* = 6 y BN = −36 + 72 = 36. La segunda derivada es −2 < 0, así que es máximo. 54 sería el beneficio bruto sin restar costos.",
- topic:"Óptimo del planificador", src:"Bloque 3 paso 1 · P4 a) · Clase 2, lám. 27–28"},
+{q:"<span class=\"newv\">Valores nuevos.</span> Un predio tiene BT(Q) = −Q² + 20Q y cada vaca cuesta $4. ¿Qué elige el planificador?",
+ o:["Q = 8 y renta 64","Q = 10 y renta 100","Q = 16 y renta 0","Q = 8 y renta 96"], a:0,
+ hint:"Escribe BN = BT − c·Q, deriva e iguala a 0. Ojo: 96 sería el beneficio bruto BT(8), sin restar costos.",
+ why:"BN = −Q² + 16Q, CPO −2Q + 16 = 0, Q* = 8 y BN = −64 + 128 = 64. Fórmula general con BT = −aQ² + bQ: Q* = (b − c)/(2a) = (20 − 4)/2 = 8. 16 sería el acceso abierto.",
+ topic:"Óptimo del planificador con otros valores", src:"Clase 2, lám. 27–28 · método de la lección"},
 {q:"En acceso abierto, ¿qué condición determina el número de vacas?",
  o:["BMg(Q) = c","BP(Q) = c, donde BP = BT/Q","BT(Q) = 0","BMg(Q) = BP(Q)"], a:1,
  hint:"Un ganadero nuevo mira lo que rinde SU vaca, que es el promedio del predio. Entra mientras eso supere su costo.",
@@ -215,27 +232,27 @@ const Q = [
  hint:"Compara BP(Q) = −Q + 15 con BMg(Q) = −2Q + 15. ¿Cuál es mayor para Q > 0, y qué incluye uno que el otro no?",
  why:"BMg = BP − (lo que la vaca nueva les quita a las demás). El ganadero ignora ese daño, por eso sigue entrando hasta disipar toda la renta. Esa disipación es la ineficiencia.",
  topic:"BP vs. BMg y externalidad", src:"Bloque 3 paso 3 · P4 b)"},
-{q:"Con 6 vacas en el predio entra la séptima. ¿Cuánto pierden en total las 6 vacas que ya estaban?",
+{q:"Predio de la Guía 1 (BT = −Q² + 15Q, c = 3). Con 6 vacas en el predio entra la séptima. ¿Cuánto pierden en total las 6 vacas que ya estaban?",
  o:["1","3","6","8"], a:2,
  hint:"BP(6) = 9 y BP(7) = 8. ¿Cuánto pierde cada vaca antigua, y cuántas son?",
  why:"Cada una de las 6 vacas pierde 1, en total 6. La vaca 7 rinde 8 a su dueño, pero el predio solo sube 2 (de 54 a 56). La diferencia, 6, es la externalidad negativa.",
  topic:"Medir la externalidad", src:"Bloque 3 paso 3 · P4 b)"},
-{q:"Con dos ganaderos, π₁ = −q₁² − q₁q₂ + 12q₁. ¿Cuál es la mejor respuesta del ganadero 1?",
- o:["q₁ = 12 − q₂","q₁ = (12 − q₂)/2","q₁ = 6 − 2q₂","q₁ = (12 − 2q₂)/3"], a:1,
- hint:"Deriva π₁ respecto de q₁, tratando q₂ como número fijo, iguala a cero y despeja.",
- why:"∂π₁/∂q₁ = −2q₁ − q₂ + 12 = 0, así que q₁ = (12 − q₂)/2. Si q₂ = 0, pone 6, como el planificador.",
- topic:"Función de mejor respuesta", src:"Bloque 3 paso 4 · P4 c) · Clase 2, lám. 35, 49–50"},
-{q:"¿Cuál es el equilibrio de Nash con dos ganaderos y la renta total?",
- o:["3 y 3; renta 36","4 y 4; renta 32","6 y 6; renta 0","4,5 y 3; renta 33"], a:1,
- hint:"Por simetría q₁ = q₂ = q. Reemplaza en q = (12 − q)/2.",
- why:"2q = 12 − q, q = 4, Q = 8. Cada uno gana −16 − 16 + 48 = 16, renta total 32: entre el óptimo (36) y el acceso abierto (0).",
- topic:"Equilibrio de Nash simétrico", src:"Bloque 3 paso 4 · P4 c)"},
-{q:"¿Por qué (3, 3) no es un equilibrio de Nash, aunque daría 18 a cada uno?",
+{q:"<span class=\"newv\">Valores nuevos.</span> Mismo predio de la pregunta anterior (BT = −Q² + 20Q, c = 4), ahora con dos ganaderos. ¿Cuál es la mejor respuesta del ganadero 1?",
+ o:["q₁ = (16 − q₂)/2","q₁ = 16 − q₂","q₁ = (20 − q₂)/2","q₁ = (16 − 2q₂)/3"], a:0,
+ hint:"π₁ = q₁·(20 − q₁ − q₂) − 4q₁. Deriva respecto de q₁ dejando q₂ fijo e iguala a cero. ¿Restaste el costo antes de despejar?",
+ why:"π₁ = −q₁² − q₁q₂ + 16q₁. CPO: −2q₁ − q₂ + 16 = 0, así que q₁ = (16 − q₂)/2. Si q₂ = 0, pone 8: el óptimo del planificador. (20 − q₂)/2 olvida el costo.",
+ topic:"Mejor respuesta con otros valores", src:"Clase 2, lám. 35 y 49–50 · método de la lección"},
+{q:"<span class=\"newv\">Valores nuevos.</span> Con la mejor respuesta q₁ = (16 − q₂)/2 y ganaderos simétricos, ¿cuál es el equilibrio de Nash?",
+ o:["q = 16/3 ≈ 5,33 cada uno; renta total ≈ 56,9","q = 4 cada uno; renta total 64","q = 8 cada uno; renta total 0","q = 5,33 cada uno; renta total 64"], a:0,
+ hint:"Iguala q₁ = q₂ = q y despeja q = (16 − q)/2. Después calcula π = q·(20 − 2q) − 4q para cada uno.",
+ why:"3q = 16, q = 16/3 ≈ 5,33, Q ≈ 10,67. Cada uno gana q(16 − 2q) = (16/3)² ≈ 28,4; total ≈ 56,9. Queda entre el óptimo (Q = 8, renta 64) y el acceso abierto (Q = 16, renta 0), igual que en la Guía 1.",
+ topic:"Equilibrio de Nash con otros valores", src:"Clase 2, lám. 49–50 · método de la lección"},
+{q:"En la Guía 1 (mejor respuesta q₁ = (12 − q₂)/2), ¿por qué (3, 3) no es un equilibrio de Nash, aunque daría 18 a cada uno?",
  o:["Porque 3 + 3 no es el óptimo","Porque si el otro pone 3, la mejor respuesta es 4,5: cada uno quiere desviarse","Porque el planificador lo prohíbe","Porque la renta total sería menor que 32"], a:1,
  hint:"Un equilibrio de Nash exige que nadie quiera cambiarse dado lo que hace el otro. Evalúa la mejor respuesta a q₂ = 3.",
  why:"q₁ = (12 − 3)/2 = 4,5 ≠ 3. Desviarse a 4 sube π₁ de 18 a 20. Es un dilema de los presos: el acuerdo conviene a ambos, pero a cada uno le conviene romperlo.",
  topic:"Dilema de los presos", src:"Bloque 3 paso 5 · Clase 2, lám. 37–39"},
-{q:"¿Qué impuesto pigouviano τ por vaca lleva a los dos ganaderos al óptimo?",
+{q:"En la Guía 1 (BT = −Q² + 15Q, c = 3, dos ganaderos, óptimo Q* = 6), ¿qué impuesto pigouviano τ por vaca lleva al óptimo?",
  o:["τ = 1","τ = 3","τ = 6","τ = 12"], a:1,
  hint:"La CPO con impuesto es −2q₁ − q₂ + 12 − τ = 0. Impón q₁ = q₂ = 3 y despeja.",
  why:"−6 − 3 + 12 − τ = 0, así que τ = 3. Y coincide con el daño externo: ∂π₂/∂q₁ = −q₂ = −3. El impuesto hace internalizar ese daño.",
@@ -319,118 +336,162 @@ const LESSONS = [
 {t:"Tasa marginal de sustitución técnica (TMST)",
  e:"La TMST mide cuántas unidades de capital puede ahorrar un sector si contrata un trabajador más, sin cambiar su producción. Es la pendiente de la isocuanta.",
  w:"Cada firma compara esa tasa con lo que cuestan los factores. Si un trabajador reemplaza más capital del que cuesta en relación al capital (TMST > w/r), le conviene contratar más trabajo. Por eso en el óptimo de la firma la TMST se iguala a w/r.",
- f:"TMST = PMg<sub>L</sub> / PMg<sub>K</sub> &nbsp;·&nbsp; con K<sup>a</sup>L<sup>b</sup>: TMST = (b/a)·(K/L)",
- k:["En Cobb-Douglas la TMST es <strong>proporcional</strong> a K/L, no igual (salvo que a = b).","El factor (b/a) viene de los exponentes: el de L arriba y el de K abajo.","Una TMST más alta significa que en ese sector un trabajador “vale” más capital."],
- s:"Clase 1, lám. 21–27 · MWG 5.C p. 135"},
+ f:"TMST = PMg<sub>L</sub> / PMg<sub>K</sub>",
+ m:["Deriva PMg<sub>L</sub> = ∂f/∂L y PMg<sub>K</sub> = ∂f/∂K.","Divide PMg<sub>L</sub> por PMg<sub>K</sub> y simplifica las potencias.","Con una Cobb-Douglas K<sup>a</sup>L<sup>b</sup> siempre llegas a (b/a)·(K/L): exponente de L arriba, exponente de K abajo."],
+ k:["Con funciones homogéneas de grado 1 (como la Cobb-Douglas de clase), la TMST es constante a lo largo de cada rayo desde el origen: depende solo de K/L.","En Cobb-Douglas la TMST es <strong>proporcional</strong> a K/L, no igual (salvo que a = b).","Una TMST más alta significa que en ese sector un trabajador “vale” más capital."],
+ g:"P2: X = K<sup>1/2</sup>L<sup>1/2</sup> da TMST<sub>X</sub> = K<sub>X</sub>/L<sub>X</sub> (factor 1). Y = K<sup>1/4</sup>L<sup>3/4</sup> da TMST<sub>Y</sub> = 3·K<sub>Y</sub>/L<sub>Y</sub>, porque (3/4)/(1/4) = 3. Ese 3 es propio del ejercicio: con otros exponentes cambia.",
+ s:"Clase 1, lám. 21 y 27"},
 {t:"Intensidad factorial",
  e:"Un bien es intensivo en capital si, enfrentando los mismos precios de factores, usa más capital por trabajador que el otro bien.",
- w:"La comparación se hace al mismo w/r porque ambos sectores contratan en los mismos mercados de factores. En Cobb-Douglas, la razón K/L de cada sector es una fracción fija de w/r, así que el orden entre sectores nunca se invierte, sea cual sea w/r.",
- f:"TMST = w/r ⇒ K/L = (a/b)·(w/r)",
- k:["En tu guía: K<sub>X</sub>/L<sub>X</sub> = w/r y K<sub>Y</sub>/L<sub>Y</sub> = (w/r)/3.","Si el enunciado dice “cualquiera sea w/r”, se prueba con una desigualdad general; los ejemplos solo ilustran.","Bienes son intensivos en factores; países son abundantes en factores. No los mezcles."],
- s:"Clase 1, lám. 24 y 30 · P2.1"},
+ w:"La comparación se hace al mismo w/r porque ambos sectores contratan en los mismos mercados de factores. Como cada firma iguala su TMST a w/r, la razón K/L de cada sector queda determinada por w/r. El sector que usa más K/L para todo w/r es el intensivo en capital.",
+ f:"Firma competitiva: TMST = w/r &nbsp;⇒&nbsp; con K<sup>a</sup>L<sup>b</sup>: K/L = (a/b)·(w/r)",
+ m:["Iguala la TMST de cada sector a w/r.","Despeja K/L de cada sector en función de w/r.","Compara con una desigualdad general válida para todo w/r > 0, no con un ejemplo."],
+ k:["En Cobb-Douglas el orden de intensidades nunca se invierte.","Si el enunciado dice “cualquiera sea w/r”, un ejemplo numérico no basta.","Los bienes son intensivos en factores; los países son abundantes en factores."],
+ g:"P2.1: K<sub>X</sub>/L<sub>X</sub> = w/r y K<sub>Y</sub>/L<sub>Y</sub> = (w/r)/3. Como w/r > (w/r)/3 para todo w/r > 0, X es intensivo en K e Y en L.",
+ s:"Clase 1, lám. 28, 30 y 34"},
 {t:"Eficiencia en producción",
- e:"Una asignación de factores es eficiente si no se puede producir más de un bien sin producir menos del otro. La condición es TMST<sub>X</sub> = TMST<sub>Y</sub>.",
- w:"Si las TMST difieren, un trabajador “vale” distinta cantidad de capital en cada sector. Llevando trabajo hacia donde vale más capital, y llevando ese capital al otro sector, ambos sectores producen más. Es como un intercambio con ganancias para los dos lados.",
- k:["Si TMST<sub>X</sub> &lt; TMST<sub>Y</sub>: el trabajo va a Y y el capital va a X.","En A = (50, 50): TMST<sub>X</sub> = 1 y TMST<sub>Y</sub> = 3, así que A no es eficiente.","Pasar a B = (62, 42) sube X de 50 a 51,03 e Y de 50 a 52,18: una mejora de Pareto."],
- s:"Clase 1, lám. 22 y 31 · P2.3"},
+ e:"Una asignación de factores es eficiente si no se puede producir más de un bien sin producir menos del otro.",
+ w:"Si las TMST difieren, un trabajador “vale” distinta cantidad de capital en cada sector. Llevando trabajo hacia donde vale más capital, y ese capital al otro sector, ambos sectores producen más. Es un intercambio con ganancias para los dos lados.",
+ f:"Eficiencia: TMST<sub>X</sub> = TMST<sub>Y</sub>",
+ m:["Calcula la TMST de cada sector en la asignación dada.","Si son iguales, es eficiente.","Si no, el trabajo va al sector con mayor TMST y el capital al de menor TMST.","Para mostrar una mejora de Pareto, calcula la producción de ambos sectores antes y después."],
+ k:["La TMST de un sector dice cuántas unidades de K vale un trabajador ahí.","Una asignación ineficiente queda dentro de la FPP.","Asignar centralizadamente exigiría que el planificador conozca todas las funciones de producción."],
+ g:"P2.3: en A = (50, 50), TMST<sub>X</sub> = 1 y TMST<sub>Y</sub> = 3, así que no es eficiente: el trabajo va a Y y el capital a X. B = (62, 42) da X ≈ 51,03 e Y ≈ 52,18, ambos mayores que 50.",
+ s:"Clase 1, lám. 22"},
 {t:"Curva de contrato y frontera de posibilidades de producción",
  e:"La curva de contrato reúne todas las asignaciones eficientes dentro de la caja de Edgeworth. La FPP es esa misma curva traducida a cantidades de bienes.",
- w:"Cada punto eficiente da el máximo de Y posible para un X dado, por eso traza la frontera. Un punto fuera de la curva de contrato desperdicia factores y queda dentro de la FPP. La FPP es cóncava porque los sectores tienen distinta intensidad: al especializarse, el sector que crece recibe factores que le rinden cada vez menos.",
- f:"K<sub>X</sub> = 300 L<sub>X</sub> / (100 + 2L<sub>X</sub>)",
- k:["Pasa por ambos orígenes: L<sub>X</sub> = 0 da K<sub>X</sub> = 0 y L<sub>X</sub> = 100 da K<sub>X</sub> = 100.","Sobre la diagonal ⇔ K<sub>X</sub> > L<sub>X</sub>: el sector intensivo en K se queda con proporcionalmente más capital.","Pendiente de la FPP = CMg<sub>X</sub>/CMg<sub>Y</sub>; en equilibrio competitivo, igual a p<sub>X</sub>/p<sub>Y</sub>."],
- s:"Clase 1, lám. 28–31 y 40 · MWG 15.D p. 529 · P2.2–P2.3"},
+ w:"Cada punto eficiente da el máximo de Y posible para un X dado, por eso traza la frontera. Un punto fuera de la curva de contrato desperdicia factores y queda dentro de la FPP. La FPP es cóncava cuando los sectores tienen distinta intensidad: al especializarse, el sector que crece recibe factores que le rinden cada vez menos.",
+ f:"TMST<sub>X</sub>(K<sub>X</sub>, L<sub>X</sub>) = TMST<sub>Y</sub>(K̄ − K<sub>X</sub>, L̄ − L<sub>X</sub>)",
+ m:["Escribe TMST<sub>X</sub> = TMST<sub>Y</sub>.","Reemplaza K<sub>Y</sub> = K̄ − K<sub>X</sub> y L<sub>Y</sub> = L̄ − L<sub>X</sub>.","Despeja K<sub>X</sub> en función de L<sub>X</sub>.","Evalúa en los orígenes y compara con la diagonal: ¿K<sub>X</sub>/K̄ es mayor o menor que L<sub>X</sub>/L̄?"],
+ k:["Con funciones homogéneas, un rayo desde el origen no corta la curva de contrato más de una vez.","El sector intensivo en K se queda con más capital por trabajador que la economía en su conjunto.","Pendiente de la FPP = CMg<sub>X</sub>/CMg<sub>Y</sub>; en equilibrio competitivo, igual a p<sub>X</sub>/p<sub>Y</sub>."],
+ g:"P2.2: K<sub>X</sub> = 300L<sub>X</sub>/(100 + 2L<sub>X</sub>). Pasa por (0, 0) y (100, 100), y K<sub>X</sub> > L<sub>X</sub> ⇔ L<sub>X</sub> &lt; 100: queda sobre la diagonal en todo el interior.",
+ s:"Clase 1, lám. 22, 28–31 y 40 · MWG 15.D p. 529"},
 {t:"Teorema de Stolper–Samuelson",
  e:"Si sube el precio relativo de un bien, sube el retorno real del factor que ese bien usa intensivamente y cae el retorno real del otro factor.",
  w:"Con competencia y retornos constantes, cada precio es igual a su costo unitario. Si p<sub>X</sub> sube y p<sub>Y</sub> no, el factor intensivo en X debe encarecerse para que el costo de X alcance a su precio, y como el costo de Y no puede subir, el otro factor debe abaratarse. Como cada precio es un promedio ponderado de los precios de los factores, el que sube debe subir más que el propio bien: es el efecto magnificación.",
- f:"%Δp<sub>X</sub> = θ<sub>K</sub>·%Δr + θ<sub>L</sub>·%Δw &nbsp;(θ = participación en el costo = exponente en Cobb-Douglas)",
- k:["Despeja primero con el bien cuyo precio no cambia: eso da la relación entre %Δr y %Δw.","Magnificación: el factor ganador sube más que ambos bienes y el perdedor baja más que ambos.","Ganan o pierden <strong>factores</strong>, no bienes ni sectores."],
- s:"Clase 1, lám. 38–40 · MWG 15.D · P2.5"},
+ f:"%Δp<sub>j</sub> = θ<sub>Kj</sub>·%Δr + θ<sub>Lj</sub>·%Δw &nbsp;(θ = participación del factor en el costo de j; en Cobb-Douglas, su exponente)",
+ m:["Escribe la ecuación de cada bien con sus participaciones.","Usa primero el bien cuyo precio no cambia: te da %Δr en función de %Δw.","Reemplaza en la ecuación del bien cuyo precio cambia y despeja.","Ordena los cambios y verifica la magnificación."],
+ k:["Gana el factor usado intensivamente en el bien que se encarece y pierde el otro, en términos reales frente a ambos bienes.","Orden siempre: %Δ(factor ganador) > %Δ(bien que sube) > %Δ(otro bien) > %Δ(factor perdedor).","Ganan o pierden <strong>factores</strong>, no bienes ni sectores."],
+ g:"P2.5: participaciones 0,5/0,5 en X y 0,25/0,75 en Y. Con p<sub>X</sub> +10% y p<sub>Y</sub> constante: %Δr = −3·%Δw, así que %Δw = −10% y %Δr = +30%. Con otras participaciones los números cambian, el método no.",
+ s:"Clase 1, lám. 38–40 · MWG 15.D"},
 {t:"Diagrama de iso-costo unitario",
  e:"Cada sector tiene una curva con las combinaciones (w, r) que hacen su costo unitario igual a su precio. Los precios de equilibrio de los factores están donde se cruzan.",
- w:"Fuera del cruce, un sector tiene costo menor a su precio y se expande, y el otro tiene pérdidas y se contrae. El que se expande demanda sobre todo su factor intensivo, lo que sube ese precio, y el que se contrae libera el otro factor, lo que baja su precio. Así (w, r) vuelve al cruce. La pendiente refleja la intensidad: el sector intensivo en trabajo es el más sensible a w.",
- k:["Con w en el eje horizontal, la curva más empinada es la del sector intensivo en trabajo.","Bajo la curva de un sector, su costo es menor que su precio: tiene ganancias y se expande.","Con precios de bienes fijos, las curvas no se mueven; se mueve el punto (w, r)."],
- s:"Clase 1, lám. 35–37 · P3.1"},
+ w:"Fuera del cruce, un sector tiene costo menor a su precio y se expande, y el otro tiene pérdidas y se contrae. El que se expande demanda sobre todo su factor intensivo, lo que sube ese precio; el que se contrae libera el otro factor, lo que baja su precio. Así (w, r) vuelve al cruce. La pendiente refleja la intensidad: el sector intensivo en trabajo es el más sensible a w.",
+ m:["Ubica el punto (w, r) respecto de cada curva: bajo la curva de un sector, su costo es menor que su precio (ganancias); sobre ella, pérdidas.","El sector con ganancias se expande y demanda sobre todo su factor intensivo; el que pierde se contrae y libera el otro.","Deduce qué factor tiene exceso de demanda (su precio sube) y cuál exceso de oferta (su precio baja)."],
+ k:["Con w en el eje horizontal, la curva más empinada es la del sector intensivo en trabajo.","Con precios de bienes fijos, las curvas no se mueven: se mueve el punto (w, r).","Durante el ajuste cambia w/r, y con eso la intensidad K/L de ambos sectores."],
+ g:"P3.1: con w > w* y r &lt; r*, X (intensivo en K) tiene ganancias e Y pérdidas. Hay exceso de demanda de K y exceso de oferta de L: r sube y w baja hasta E.",
+ s:"Clase 1, lám. 35–37"},
 {t:"Modelo de Heckscher–Ohlin",
  e:"Un país exporta el bien que usa intensivamente su factor abundante e importa el que usa su factor escaso.",
  w:"En autarquía, el factor abundante es barato, así que el bien que lo usa intensivamente también lo es. Al abrirse, ese precio sube hacia el mundial, el país produce más de ese bien y, por Stolper–Samuelson, sube el retorno del factor abundante y cae el del escaso. El comercio de bienes funciona como un intercambio indirecto de factores.",
- k:["Cadena: abundancia → precio relativo bajo en autarquía → la apertura sube ese precio → la producción se mueve por la FPP → gana el factor abundante y pierde el escaso.","El consumo se separa de la producción.","Se comercian bienes, no factores: no se “importa trabajo”."],
- s:"Clase 1, lám. 41 · P3.2"},
+ m:["Identifica el factor abundante del país y qué bien lo usa intensivamente.","Ese bien es relativamente barato en autarquía; con la apertura su precio relativo sube.","La producción se mueve por la FPP hacia ese bien y el consumo se separa de la producción.","Aplica Stolper–Samuelson: gana el factor abundante, pierde el escaso."],
+ k:["Se comercian bienes, no factores: no se “importa trabajo”.","Países abundantes en factores; bienes intensivos en factores.","Si el país es abundante en el otro factor, toda la cadena se invierte."],
+ g:"P3.2: país abundante en K, X intensivo en K: p<sub>X</sub>/p<sub>Y</sub> sube, se exporta X, r sube y w cae.",
+ s:"Clase 1, lám. 41"},
 {t:"Óptimo del planificador en un recurso común",
  e:"El uso óptimo de un predio maximiza su renta neta: el beneficio total menos el costo total de las vacas.",
  w:"El planificador mira el predio completo. Agrega vacas mientras la última sume más de lo que cuesta. Así toma en cuenta los dos efectos de cada vaca: lo que produce ella y lo que reduce la producción de las demás.",
- f:"máx BN(Q) = BT(Q) − c·Q &nbsp;⇒&nbsp; BT′(Q) = c",
- k:["El costo total es c·Q, no c.","La CSO (BN″ &lt; 0) confirma que es un máximo.","En P4: BN = −Q² + 12Q, Q* = 6, renta 36."],
- s:"Clase 2, lám. 26–28 · P4 a)"},
+ f:"máx BN(Q) = BT(Q) − c·Q &nbsp;⇒&nbsp; BT′(Q) = c &nbsp;·&nbsp; con BT = −aQ² + bQ: Q* = (b − c)/(2a)",
+ m:["Escribe BN(Q) = BT(Q) − c·Q. El costo total es c·Q, no c.","CPO: BN′(Q) = 0, es decir BMg = c. Despeja Q*.","CSO: BN″(Q) &lt; 0 confirma que es máximo.","Renta: reemplaza Q* en BN."],
+ k:["El planificador internaliza el efecto de cada vaca sobre las demás.","La derivada es una función nueva: nunca escribas la derivada igual a la función original."],
+ g:"P4 a): BT = −Q² + 15Q y c = 3, así que BN = −Q² + 12Q, Q* = 6 y renta 36.",
+ s:"Clase 2, lám. 26–28"},
 {t:"Acceso abierto y tragedia de los comunes",
- e:"Si nadie es dueño y la entrada es libre, cada ganadero entra mientras lo que rinde su vaca, que es el beneficio promedio, supere su costo.",
- w:"Quien entra se lleva el beneficio promedio de una vaca, pero no paga por el pasto que les quita a las demás. Como el beneficio promedio es mayor que el marginal, siguen entrando vacas hasta que el promedio iguala al costo. En ese punto la renta total es cero: se disipa por completo.",
- f:"BP(Q) = BT(Q)/Q = c",
- k:["Es una condición de libre entrada, no una CPO.","BP − BMg = lo que la vaca nueva les quita a las demás.","La disipación total de la renta es la ineficiencia, no una ausencia de ella."],
- s:"Clase 2, lám. 26–28 · P4 b)"},
+ e:"Si nadie es dueño y la entrada es libre, cada usuario entra mientras lo que rinde su unidad, que es el beneficio promedio, supere su costo.",
+ w:"Quien entra se lleva el beneficio promedio, pero no paga por lo que les quita a los demás. Como el beneficio promedio es mayor que el marginal, siguen entrando hasta que el promedio iguala al costo. En ese punto la renta total es cero: se disipa por completo.",
+ f:"BP(Q) = BT(Q)/Q = c &nbsp;·&nbsp; con BT = −aQ² + bQ: Q<sub>AA</sub> = (b − c)/a, el doble del óptimo",
+ m:["Calcula BP(Q) = BT(Q)/Q.","Iguala BP(Q) = c y despeja Q.","Calcula la renta con BN = BT − c·Q: con libre entrada da 0."],
+ k:["Es una condición de libre entrada, no una CPO.","BP − BMg = lo que la última unidad les quita a las demás.","La disipación total de la renta es la ineficiencia."],
+ g:"P4 b): BP = −Q + 15 = 3, así que Q = 12 (el doble de 6) y la renta es 0.",
+ s:"Clase 2, lám. 26–28"},
 {t:"Qué es una externalidad y cómo se mide",
  e:"Hay una externalidad cuando la acción de un agente afecta directamente el bienestar o la producción de otro, sin pasar por los precios (MWG, Def. 11.B.1).",
- w:"En el predio, la vaca nueva baja directamente lo que rinden todas las demás. Ese daño no lo paga quien trae la vaca, por eso la decisión privada se aparta del óptimo. Se mide dejando fijas las vacas de los demás y viendo cuánto cae lo que ellas producen.",
- k:["Daño = caída del beneficio por vaca × número de vacas afectadas.","Una externalidad pecuniaria (efecto vía precios) no genera ineficiencia; una tecnológica sí.","Es la base de las soluciones de Pigou y de Coase."],
- s:"MWG 11.B p. 351–352 · Clase 2, lám. 3–5"},
+ w:"En un recurso común, la unidad nueva baja directamente lo que rinden todas las demás. Ese daño no lo paga quien la agrega, por eso la decisión privada se aparta del óptimo.",
+ f:"Daño marginal externo = |∂π<sub>j</sub>/∂q<sub>i</sub>|, con q<sub>j</sub> fijo",
+ m:["Fija las unidades de los otros agentes.","Calcula cuánto cambia su beneficio cuando un agente agrega una unidad.","Ese valor, en valor absoluto, es el daño externo."],
+ k:["Daño = caída del rendimiento por unidad × número de unidades afectadas.","Una externalidad pecuniaria (efecto vía precios) no genera ineficiencia; una tecnológica sí.","Es la base de las soluciones de Pigou y de Coase."],
+ g:"P4: la vaca 7 baja el BP de 9 a 8; las 6 vacas antiguas pierden 1 cada una, 6 en total. Con dos ganaderos: ∂π₂/∂q₁ = −q₂.",
+ s:"MWG 11.B pp. 351–352 · Clase 2, lám. 3–5"},
 {t:"Mejor respuesta y equilibrio de Nash",
  e:"En un equilibrio de Nash, cada jugador elige lo mejor dado lo que hace el otro, y nadie quiere cambiar su decisión.",
- w:"Con dos ganaderos, cada uno sí considera el daño que una vaca extra causa a sus propias vacas, pero no el que causa a las del otro. Por eso ponen menos vacas que en acceso abierto y más que en el óptimo.",
- f:"Mejor respuesta: ∂π<sub>i</sub>/∂q<sub>i</sub> = 0 con q<sub>j</sub> fijo",
- k:["La ganancia de cada uno usa el BP del total: π₁ = q₁·BP(q₁ + q₂) − c·q₁.","El Nash está donde se cruzan las dos funciones de mejor respuesta.","Si los jugadores son simétricos, en equilibrio q₁ = q₂."],
- s:"Clase 2, lám. 35 y 49–50 · Nicholson cap. 12 pp. 353–357 · P4 c)"},
+ w:"Con pocos usuarios, cada uno sí considera el daño que una unidad extra causa a sus propias unidades, pero no el que causa a las de los demás. Por eso el total queda entre el óptimo y el acceso abierto.",
+ f:"π<sub>i</sub> = q<sub>i</sub>·BP(Q) − c·q<sub>i</sub> &nbsp;⇒&nbsp; ∂π<sub>i</sub>/∂q<sub>i</sub> = 0 con q<sub>j</sub> fijo &nbsp;·&nbsp; con BT = −aQ² + bQ y n jugadores: q = (b − c)/(a(n + 1))",
+ m:["Escribe la ganancia de cada jugador: sus unidades × BP del total, menos c × sus unidades.","Deriva respecto de su propia variable, con la del otro fija, e iguala a 0: esa es la mejor respuesta.","Resuelve el sistema de mejores respuestas; si son simétricos, usa q₁ = q₂.","Calcula ganancias y compara con el óptimo y el acceso abierto."],
+ k:["Con n = 1 la fórmula da el óptimo; si n crece, tiende al acceso abierto.","El Nash está donde se cruzan las funciones de mejor respuesta.","Un equilibrio de Nash no tiene por qué ser eficiente."],
+ g:"P4 c): q₁ = (12 − q₂)/2, Nash con 4 vacas cada uno, 16 de ganancia cada uno y renta total 32.",
+ s:"Clase 2, lám. 35 y 49–50 · Nicholson cap. 12 pp. 353–357"},
 {t:"Dilema de los presos",
  e:"Es un juego en que ambos jugadores estarían mejor cooperando, pero a cada uno le conviene desviarse si el otro coopera.",
- w:"El acuerdo es mejor para ambos que el equilibrio de Nash, pero no es una mejor respuesta: dado que el otro cumple, romper el acuerdo paga más. Sin algo que castigue la desviación, como un juego repetido o un contrato, el acuerdo no se sostiene.",
- k:["Un equilibrio de Nash no tiene por qué ser Pareto eficiente.","Para saber si un acuerdo es Nash, evalúa la mejor respuesta de cada jugador en ese acuerdo.","En juegos repetidos (clase 3) la cooperación puede sostenerse con amenazas de castigo."],
+ w:"El acuerdo es mejor para ambos que el equilibrio de Nash, pero no es una mejor respuesta: si el otro cumple, romper el acuerdo paga más. Sin algo que castigue la desviación, como un juego repetido o un contrato, el acuerdo no se sostiene.",
+ m:["Toma el acuerdo propuesto, por ejemplo el óptimo repartido en partes iguales.","Calcula la mejor respuesta de un jugador si el otro cumple.","Si esa mejor respuesta difiere del acuerdo, no es Nash: hay incentivo a desviarse."],
+ k:["Nash y eficiencia de Pareto son conceptos distintos.","En juegos repetidos (clase 3) la cooperación puede sostenerse con amenazas de castigo."],
+ g:"P4 c): con q₂ = 3, la mejor respuesta es q₁ = 4,5 ≠ 3. Desviarse a 4 sube π₁ de 18 a 20.",
  s:"Clase 2, lám. 37–39 · Nicholson pp. 358–361"},
 {t:"Impuesto pigouviano",
  e:"Un impuesto por unidad igual al daño marginal que esa unidad causa a terceros hace que el agente internalice la externalidad.",
- w:"Con el impuesto, el costo privado de una vaca pasa a ser igual a su costo social. Entonces la decisión privada coincide con la del planificador. La recaudación no se pierde: es una transferencia de los ganaderos al Estado.",
- k:["τ = daño marginal evaluado en el óptimo.","El Estado necesita conocer BT y el tamaño de la externalidad: es la principal limitación de Pigou.","Eficiencia (cuánto se produce) y distribución (quién se queda con qué) son preguntas distintas."],
- s:"Clase 2, lám. 6–9 · MWG 11.B p. 351 · P4 d)"},
+ w:"Con el impuesto, el costo privado de una unidad pasa a ser igual a su costo social. Entonces la decisión privada coincide con la del planificador. La recaudación no se pierde: es una transferencia de los agentes al Estado.",
+ f:"τ* = daño marginal externo evaluado en el óptimo",
+ m:["Escribe la ganancia de cada agente con costo (c + τ) por unidad.","Saca la CPO con τ.","Impón que cada agente elija su parte del óptimo y despeja τ.","Verifica que τ = |∂π<sub>j</sub>/∂q<sub>i</sub>| en el óptimo.","Calcula ganancias, recaudación (τ × Q*) y total: debe dar la renta óptima."],
+ k:["El Estado necesita conocer BT y el tamaño de la externalidad: es la principal limitación de Pigou.","Eficiencia (cuánto se produce) y distribución (quién se queda con qué) son preguntas distintas."],
+ g:"P4 d): τ = 3, que coincide con q₂* = 3. Utilidades 9 + 9, recaudación 18, total 36.",
+ s:"Clase 2, lám. 6–9 · MWG 11.B p. 351"},
 {t:"Teorema de Coase",
  e:"Con derechos de propiedad bien definidos y sin costos de transacción, la negociación lleva al resultado eficiente, sin importar a quién se asignen los derechos.",
  w:"El dueño del recurso se queda con toda la renta, ya sea usándolo él o cobrando arriendo. Por eso le conviene maximizarla, y al hacerlo internaliza todo el daño. La asignación de derechos solo decide quién se queda con la renta.",
- k:["La eficiencia no depende de quién tenga el derecho.","La distribución sí depende.","Ejemplo de clase: minera y comunidades, con el derecho en una u otra parte."],
- s:"Clase 2, lám. 10–16 · P4 e)"},
+ m:["Identifica quién tiene el derecho: ese agente maximiza la renta total.","La cantidad resultante es la del planificador.","Si cambia el dueño, la cantidad no cambia; solo cambia quién recibe la renta."],
+ k:["La eficiencia no depende de quién tenga el derecho; la distribución sí.","Ejemplo de clase: minera y comunidades, con el derecho en una u otra parte."],
+ g:"P4 e): 6 vacas con derechos al ganadero 1 o al 2; el dueño se queda con los 36.",
+ s:"Clase 2, lám. 10–16"},
 {t:"Farrell: dos resultados de descentralización",
  e:"Farrell (1987) presenta el Teorema de Coase como un resultado de descentralización, igual que el Primer Teorema del Bienestar.",
  w:"Ambos dicen que decisiones individuales egoístas llevan a la eficiencia si todo es transable. Difieren en los supuestos. El Teorema del Bienestar exige mercados competitivos completos, convexidad y precios dados; ahí basta la acción unilateral de cada agente. Coase prescinde de eso, pero supone que ningún acuerdo beneficioso queda sin hacerse, lo que exige negociar y coordinarse.",
  k:["Coase economiza en instituciones formales, pero exige mucha coordinación.","Mercados competitivos: acción unilateral. Coase: acción conjunta.","Por eso Coase es más ambicioso: sugeriría que ni el monopolio ni los bienes públicos son problema."],
- s:"Farrell (1987), pp. 113–114 · P1.5"},
+ g:"Pregunta de lectura P1.5.",
+ s:"Farrell (1987), pp. 113–114"},
 {t:"Farrell: información privada y el burócrata torpe",
  e:"Con información privada, la negociación voluntaria no garantiza la eficiencia, pero eso no prueba que el gobierno lo haga mejor.",
  w:"Si cada parte esconde cuánto valora el acuerdo para conseguir un mejor precio, acuerdos que convenían a ambos se demoran o no se firman. Myerson–Satterthwaite muestra que ningún mecanismo voluntario evita esto siempre. Pero el gobierno tampoco conoce las valoraciones privadas: el modelo del burócrata torpe muestra que una regla centralizada puede ser mejor o peor, según el caso.",
  k:["Hay que modelar las imperfecciones del mercado y del gobierno antes de elegir.","Ninguno de los dos teoremas prueba que el laissez-faire sea mejor que la intervención (p. 116).","Hayek: descentralizar es delegar decisiones en quien sabe más; el subastador walrasiano no lo es."],
- s:"Farrell (1987), pp. 114–124 · P4 e)"},
+ g:"P1.5 y P4 e).",
+ s:"Farrell (1987), pp. 114–124"},
 {t:"Movilidad factorial y conflicto político",
  e:"El tipo de conflicto político que genera el comercio depende de cuán fácil es mover los factores entre sectores.",
  w:"Si un factor se mueve libremente, su ingreso depende de qué factor es (capital o trabajo), no del sector donde está: el conflicto es de clases, como en Stolper–Samuelson. Si está atado a su sector, su ingreso depende de la suerte de ese sector: el conflicto es sectorial, como en el modelo de factores específicos. La realidad suele estar entre los dos.",
  k:["Stolper–Samuelson: movilidad total, largo plazo, factor contra factor (Rogowski).","Factores específicos (Ricardo–Viner, SSK): capital fijo, corto plazo, sector contra sector (Frieden).","Grossman (1983): cada unidad de capital tiene un costo de ajuste distinto, lo que da un espectro entre ambos extremos."],
- s:"Brawley (1997), pp. 633–641 · P1.4"},
+ g:"Pregunta de lectura P1.4.",
+ s:"Brawley (1997), pp. 633–641"},
 {t:"Brawley: factores parcialmente móviles en la Alemania imperial",
  e:"Brawley divide cada factor en una parte móvil y partes específicas a cada sector, y con eso explica por qué en Alemania la protección persistió.",
  w:"Los factores específicos siguen a su sector. El factor móvil abundante apoya el libre comercio, porque puede ir al sector que se expande. El móvil escaso queda en una posición ambigua: gana empleo pero pierde retorno. Esos grupos ambiguos hicieron imposible armar una coalición librecambista estable.",
  k:["1879: Bismarck forma la coalición proteccionista entre Junkers e industria pesada, tras la llegada de grano barato.","La coalición librecambista fracasó dos veces: con Caprivi (1890) y en 1909.","Conclusión: algunos actores estaban en conflicto sectorial y otros en conflicto factorial."],
+ g:"Pregunta de lectura P1.4.",
  s:"Brawley (1997), pp. 634, 638, 641, 647 y 651–652"},
 {t:"Apertura comercial y skill premium",
  e:"La apertura cambia el salario relativo entre calificados y no calificados a través de los precios relativos de los bienes: es Stolper–Samuelson con dos tipos de trabajo como factores.",
  w:"Si con la apertura caen los precios de bienes intensivos en trabajo no calificado, cae su salario relativo y la brecha sube. Si caen los de bienes intensivos en calificación, la brecha baja. El resultado depende de qué precios cambian, no de una regla fija para “países en desarrollo”. También pesan la oferta de educación y el cambio tecnológico sesgado.",
  k:["“Mecanismo” = la cadena: apertura → precios relativos → demanda relativa por calificación → skill premium.","Chile (Beyer, Rojas y Vergara, 1999): se desprotegieron sectores intensivos en no calificado, como textil y calzado.","Brasil (Gonzaga, Menezes y Terra, 2006): aranceles de 42,6% a 13,4% entre 1988 y 1995; los precios cayeron más en sectores intensivos en calificación."],
- s:"Beyer y otros (1999) · Gonzaga y otros (2006) · P1.2"}
+ g:"Pregunta de lectura P1.2.",
+ s:"Beyer y otros (1999) · Gonzaga y otros (2006)"}
 ];
+const KIND = ["guia","nuevo","teoria","guia","guia","teoria","nuevo","nuevo","teoria","teoria", "nuevo","teoria","teoria","guia","nuevo","nuevo","guia","guia","guia","teoria", "lectura","lectura","lectura","lectura","lectura","lectura","lectura","lectura","lectura","lectura"];
+const KLABEL = {teoria:"Teoría", guia:"Ejercicio · valores de la Guía 1", nuevo:"Ejercicio · valores nuevos", lectura:"Lectura"};
 const QL = [0,0,1,2,3,3,4,4,5,6, 7,8,8,9,10,10,11,12,12,13, 14,14,15,15,16,16,17,17,18,18];
 
 function lessonHTML(L){
   const l = LESSONS[L];
-  return `<div class="ls-sec"><h4>La esencia</h4><p>${l.e}</p></div>
-    <div class="ls-sec"><h4>Por qué</h4><p>${l.w}</p></div>
-    ${l.f?`<div class="formula">${l.f}</div>`:""}
-    <div class="ls-sec"><h4>Puntos clave</h4><ul>${l.k.map(x=>`<li>${x}</li>`).join("")}</ul></div>
-    <p class="src">Fuente: ${l.s}</p>`;
+  const isRead = !l.m;
+  return `<div class="part theory">
+      <div class="part-h">Teoría de clase · vale para cualquier valor</div>
+      <div class="ls-sec"><h4>La esencia</h4><p>${l.e}</p></div>
+      <div class="ls-sec"><h4>Por qué</h4><p>${l.w}</p></div>
+      ${l.f?`<div class="ls-sec"><h4>Fórmula general</h4><div class="formula">${l.f}</div></div>`:""}
+      <div class="ls-sec"><h4>Puntos clave</h4><ul>${l.k.map(x=>`<li>${x}</li>`).join("")}</ul></div>
+      <p class="src">Fuente: ${l.s}</p>
+    </div>
+    ${l.m?`<div class="part method"><div class="part-h">Método general · pasos para el examen</div><ol>${l.m.map(x=>`<li>${x}</li>`).join("")}</ol></div>`:""}
+    <div class="part guide"><div class="part-h">${isRead?"Dónde aparece en la Guía 1":"Aplicación en la Guía 1 · ejercicio, en el examen los valores pueden cambiar"}</div><p>${l.g}</p></div>`;
 }
 
-const KEY = "ensayo-micro-v2";
+const KEY = "ensayo-micro-v3";
 const LETTERS = ["A","B","C","D"];
 let st = load() || fresh();
 
@@ -505,7 +566,7 @@ function renderQuestion(){
 
   const last = (i%10===9);
   stage.innerHTML = `<section class="card">
-    <div class="qmeta"><span>${BLOCKS[blockOf(i)].name} · Pregunta ${i%10+1} de 10</span><span>${q.topic}</span></div>
+    <div class="qmeta"><span>${BLOCKS[blockOf(i)].name} · Pregunta ${i%10+1} de 10</span><span class="kind k-${KIND[i]}">${KLABEL[KIND[i]]}</span></div>
     <details class="recall" id="recall-${i}"><summary>Volver a ver la materia: ${LESSONS[L].t}</summary><div class="recall-body">${lessonHTML(L)}</div></details>
     <p class="qtext">${q.q}</p>
     <div class="opts">${opts}</div>
