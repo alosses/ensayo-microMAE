@@ -1,0 +1,613 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}[hidden]{display:none!important}</style>
+<title>Ensayo Micro Aplicada</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@500;700;800&family=Source+Sans+3:wght@400;600&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: una columna tipo hoja de cuaderno cuadriculado; la pregunta es la tarjeta, el progreso va arriba */
+:root{
+  --paper:#f6f8fb; --grid:#e3e8f0; --sheet:#ffffff; --ink:#18202e; --muted:#5b6578;
+  --pen:#1d4ed8; --pen-soft:#e4ebff;
+  --ok:#16794a; --ok-soft:#dcf5e6;
+  --hint:#9a5b00; --hint-soft:#fff1d6;
+  --bad:#b4232c; --bad-soft:#fde3e4;
+  --line:#d6dce6;
+  --display:"Schibsted Grotesk", "Segoe UI", system-ui, sans-serif;
+  --body:"Source Sans 3", "Segoe UI", system-ui, sans-serif;
+  --mono:"JetBrains Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --paper:#11151d; --grid:#1b2230; --sheet:#171d28; --ink:#e7ebf3; --muted:#9aa4b8;
+  --pen:#8fb0ff; --pen-soft:#1f2b48; --ok:#5fd394; --ok-soft:#14301f; --hint:#f2b75a; --hint-soft:#33280f;
+  --bad:#ff8a90; --bad-soft:#3a1a1d; --line:#2a3344; color-scheme:dark;}}
+:root[data-theme="dark"]{
+  --paper:#11151d; --grid:#1b2230; --sheet:#171d28; --ink:#e7ebf3; --muted:#9aa4b8;
+  --pen:#8fb0ff; --pen-soft:#1f2b48; --ok:#5fd394; --ok-soft:#14301f; --hint:#f2b75a; --hint-soft:#33280f;
+  --bad:#ff8a90; --bad-soft:#3a1a1d; --line:#2a3344; color-scheme:dark;}
+
+*{box-sizing:border-box}
+body{
+  background-color:var(--paper);
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size:22px 22px;
+  color:var(--ink); font:17px/1.55 var(--body);
+  padding-left:max(16px, env(safe-area-inset-left, 0px));
+  padding-right:max(16px, env(safe-area-inset-right, 0px));
+  padding-block:24px 48px;
+}
+.wrap{max-width:760px;margin:0 auto;display:flex;flex-direction:column;gap:18px}
+header{display:flex;flex-direction:column;gap:6px}
+.eyebrow{font:600 12px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--pen)}
+h1{font:800 clamp(28px,6vw,40px)/1.1 var(--display);margin:0;text-wrap:balance}
+.sub{color:var(--muted);margin:0;max-width:62ch}
+
+.blocks{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.blk{background:var(--sheet);border:1px solid var(--line);border-radius:10px;padding:10px 12px;display:flex;flex-direction:column;gap:6px;min-width:0}
+.blk b{font:700 14px/1.2 var(--display)}
+.blk span{font-size:13px;color:var(--muted)}
+.blk.on{border-color:var(--pen);box-shadow:0 0 0 2px var(--pen-soft)}
+.dots{display:flex;gap:4px;flex-wrap:wrap}
+.dot{width:12px;height:12px;border-radius:3px;background:var(--grid);border:1px solid var(--line)}
+.dot.c1{background:var(--ok);border-color:var(--ok)}
+.dot.c2{background:var(--hint);border-color:var(--hint)}
+.dot.x{background:var(--bad);border-color:var(--bad)}
+.dot.now{outline:2px solid var(--pen);outline-offset:1px}
+
+.card{background:var(--sheet);border:1px solid var(--line);border-radius:14px;padding:22px clamp(16px,4vw,28px);display:flex;flex-direction:column;gap:16px;box-shadow:0 1px 0 var(--line)}
+.qmeta{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font:600 12px/1.3 var(--mono);letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}
+.qtext{font:700 20px/1.35 var(--display);margin:0;text-wrap:pretty}
+.opts{display:flex;flex-direction:column;gap:10px}
+.opt{display:flex;gap:12px;align-items:flex-start;text-align:left;width:100%;background:var(--sheet);color:var(--ink);border:1.5px solid var(--line);border-radius:10px;padding:12px 14px;font:inherit;cursor:pointer;transition:border-color .15s, background .15s}
+.opt:hover:not(:disabled){border-color:var(--pen);background:var(--pen-soft)}
+.opt:focus-visible,.btn:focus-visible{outline:3px solid var(--pen);outline-offset:2px}
+.opt:disabled{cursor:default}
+.opt .k{font:600 13px/1.6 var(--mono);color:var(--muted);flex:none;width:1.4em}
+.opt span{min-width:0}
+.opt.right{border-color:var(--ok);background:var(--ok-soft)}
+.opt.wrong{border-color:var(--bad);background:var(--bad-soft);text-decoration:line-through;text-decoration-color:var(--bad)}
+.opt.dim{opacity:.55}
+.fb{border-radius:10px;padding:14px 16px;display:flex;flex-direction:column;gap:6px}
+.fb h3{margin:0;font:700 15px/1.3 var(--display)}
+.fb p{margin:0}
+.fb.ok{background:var(--ok-soft);border-left:4px solid var(--ok)}
+.fb.ok h3{color:var(--ok)}
+.fb.hint{background:var(--hint-soft);border-left:4px solid var(--hint)}
+.fb.hint h3{color:var(--hint)}
+.fb.bad{background:var(--bad-soft);border-left:4px solid var(--bad)}
+.fb.bad h3{color:var(--bad)}
+.src{font:400 13px/1.4 var(--mono);color:var(--muted)}
+.actions{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end}
+.btn{font:700 15px/1 var(--display);border-radius:9px;padding:12px 18px;cursor:pointer;border:1.5px solid var(--pen);background:var(--pen);color:var(--sheet)}
+.btn.ghost{background:transparent;color:var(--pen)}
+.btn[disabled]{opacity:.4;cursor:default}
+code,.m{font-family:var(--mono);font-size:.92em}
+
+.sum{display:flex;flex-direction:column;gap:16px}
+.score{display:flex;gap:10px;flex-wrap:wrap}
+.pill{border-radius:999px;padding:6px 12px;font:600 14px/1.2 var(--body);border:1px solid var(--line)}
+.pill.c1{background:var(--ok-soft);color:var(--ok);border-color:var(--ok)}
+.pill.c2{background:var(--hint-soft);color:var(--hint);border-color:var(--hint)}
+.pill.x{background:var(--bad-soft);color:var(--bad);border-color:var(--bad)}
+.big{font:800 44px/1 var(--display);font-variant-numeric:tabular-nums}
+.big small{font:600 16px var(--body);color:var(--muted)}
+.study{display:flex;flex-direction:column;gap:10px;margin:0;padding:0;list-style:none}
+.study li{border:1px solid var(--line);border-radius:10px;padding:12px 14px;display:flex;flex-direction:column;gap:4px}
+.study li b{font:700 15px/1.3 var(--display)}
+.tag{font:600 11px/1 var(--mono);text-transform:uppercase;letter-spacing:.06em;padding:4px 7px;border-radius:5px;align-self:flex-start}
+.tag.c2{background:var(--hint-soft);color:var(--hint)}
+.tag.x{background:var(--bad-soft);color:var(--bad)}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:13px;color:var(--muted)}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;vertical-align:-1px}
+h2{font:800 24px/1.2 var(--display);margin:0;text-wrap:balance}
+.lesson{border-color:var(--pen);border-top:4px solid var(--pen)}
+.lesson .eyebrow{margin-bottom:-8px}
+.ls-sec{display:flex;flex-direction:column;gap:4px}
+.ls-sec h4{margin:0;font:600 12px/1.3 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--pen)}
+.ls-sec p{margin:0;max-width:66ch}
+.ls-sec ul{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px;max-width:66ch}
+.formula{font:400 15px/1.6 var(--mono);background:var(--pen-soft);border-radius:8px;padding:10px 14px;overflow-x:auto}
+.recall{border:1px dashed var(--line);border-radius:10px;padding:8px 12px}
+.recall summary{cursor:pointer;font:600 14px/1.4 var(--body);color:var(--pen)}
+.recall summary:focus-visible{outline:3px solid var(--pen);outline-offset:2px}
+.recall-body{display:flex;flex-direction:column;gap:12px;padding-top:12px}
+@media (max-width:520px){.blocks{grid-template-columns:1fr}.qtext{font-size:18px}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Microeconomía Aplicada · MAE Weekend</div>
+    <h1>Ensayo para el examen</h1>
+    <p class="sub">19 lecciones cortas y 30 preguntas en 3 bloques. Primero lees la materia, después respondes. Si fallas, recibes una pista y otra oportunidad. Al cerrar cada bloque ves qué repasar y dónde.</p>
+  </header>
+
+  <div class="blocks" id="blocks"></div>
+  <div class="legend">
+    <span><i style="background:var(--ok)"></i>Correcta al primer intento</span>
+    <span><i style="background:var(--hint)"></i>Correcta con pista</span>
+    <span><i style="background:var(--bad)"></i>Incorrecta</span>
+  </div>
+
+  <main id="stage"></main>
+</div>
+
+<script>
+const BLOCKS = [
+  {name:"Bloque 1", title:"Equilibrio general y comercio"},
+  {name:"Bloque 2", title:"Comunes, Nash, Pigou y Coase"},
+  {name:"Bloque 3", title:"Lecturas: Farrell, Brawley, Chile y Brasil"}
+];
+
+const Q = [
+/* ---------- BLOQUE 1 ---------- */
+{q:"Con X = K<sub>X</sub><sup>1/2</sup> L<sub>X</sub><sup>1/2</sup>, ¿cuál es la TMST<sub>X</sub> = PMgL / PMgK?",
+ o:["L<sub>X</sub> / K<sub>X</sub>","K<sub>X</sub> / L<sub>X</sub>","3·K<sub>X</sub> / L<sub>X</sub>","Siempre 1"], a:1,
+ hint:"En una Cobb-Douglas K<sup>a</sup>L<sup>b</sup>, PMgL/PMgK = (b/a)·(K/L). Aquí a = b = 1/2.",
+ why:"(1/2)/(1/2) = 1, así que TMST<sub>X</sub> = K<sub>X</sub>/L<sub>X</sub>. Es proporcional a K/L, no constante.",
+ topic:"TMST en Cobb-Douglas", src:"Guía de estudio, Bloque 1 paso 1 · Clase 1, lám. 21–27"},
+{q:"Con Y = K<sub>Y</sub><sup>1/4</sup> L<sub>Y</sub><sup>3/4</sup>, la TMST<sub>Y</sub> es:",
+ o:["K<sub>Y</sub> / L<sub>Y</sub>","(1/3)·K<sub>Y</sub> / L<sub>Y</sub>","3·K<sub>Y</sub> / L<sub>Y</sub>","3·L<sub>Y</sub> / K<sub>Y</sub>"], a:2,
+ hint:"Usa la misma regla: (exponente de L / exponente de K)·(K/L).",
+ why:"(3/4)/(1/4) = 3, entonces TMST<sub>Y</sub> = 3·K<sub>Y</sub>/L<sub>Y</sub>. Fue uno de tus errores en la guía: la TMST no es igual a K/L, es proporcional.",
+ topic:"TMST en Cobb-Douglas", src:"Bloque 1 paso 1 · P2.1"},
+{q:"¿Cuál es la forma correcta de probar que X es intensivo en capital <em>cualquiera sea</em> w/r?",
+ o:["Mostrar que con w/r = 6, K<sub>X</sub>/L<sub>X</sub> = 6 y K<sub>Y</sub>/L<sub>Y</sub> = 2","Notar que K<sub>X</sub>/L<sub>X</sub> = w/r > (w/r)/3 = K<sub>Y</sub>/L<sub>Y</sub> para todo w/r > 0","Ver que X tiene exponentes iguales","Comprobar que la curva de contrato pasa por ambos orígenes"], a:1,
+ hint:"Cuando el enunciado dice \"cualquiera sea\", un ejemplo numérico no basta. ¿Qué expresión vale para todo w/r?",
+ why:"Cada firma iguala TMST = w/r. Eso da K<sub>X</sub>/L<sub>X</sub> = w/r y K<sub>Y</sub>/L<sub>Y</sub> = (w/r)/3, y la desigualdad vale para todo w/r positivo. Los ejemplos solo ilustran.",
+ topic:"Prueba general de intensidad factorial", src:"Bloque 1 paso 2 · P2.1"},
+{q:"En la asignación A con K<sub>X</sub> = L<sub>X</sub> = 50: TMST<sub>X</sub> = 1 y TMST<sub>Y</sub> = 3. ¿Hacia dónde deben moverse los factores para ganar eficiencia?",
+ o:["Trabajo de Y a X y capital de X a Y","Trabajo de X a Y y capital de Y a X","Ambos factores de X a Y","No hay que moverlos: A está en la curva de contrato"], a:1,
+ hint:"La TMST dice cuántas unidades de K \"vale\" un trabajador en cada sector. ¿Dónde vale más un trabajador?",
+ why:"En Y un trabajador vale 3 unidades de K y en X vale 1. Conviene llevar trabajo a Y y capital a X hasta igualar las TMST. Tú invertiste esta dirección en un primer intento.",
+ topic:"Eficiencia y dirección de reasignación", src:"Bloque 1 paso 5 · P2.3"},
+{q:"La curva de contrato K<sub>X</sub> = 300L<sub>X</sub>/(100 + 2L<sub>X</sub>) queda <strong>sobre</strong> la diagonal de la caja. ¿Qué significa?",
+ o:["Que el sector Y usa más capital que X","Que X, intensivo en K, usa una proporción K/L mayor que la de la economía","Que la asignación es ineficiente","Que w/r es mayor que 1"], a:1,
+ hint:"Sobre la diagonal significa K<sub>X</sub> > L<sub>X</sub>. Relaciónalo con lo que probaste sobre intensidad factorial.",
+ why:"K<sub>X</sub> > L<sub>X</sub> ⇔ L<sub>X</sub> &lt; 100: vale en todo el interior. X, intensivo en capital, se queda con proporcionalmente más K que la dotación (100/100).",
+ topic:"Curva de contrato y diagonal", src:"Bloque 1 paso 4 · P2.2"},
+{q:"Una asignación de factores que <strong>no</strong> está en la curva de contrato corresponde, en el espacio de bienes, a un punto:",
+ o:["Sobre la FPP","Fuera de la FPP, inalcanzable","Dentro de la FPP","En el vértice de la FPP"], a:2,
+ hint:"Si se puede producir más de ambos bienes reasignando factores, ¿estás en la frontera?",
+ why:"Si TMST<sub>X</sub> ≠ TMST<sub>Y</sub>, hay una reasignación que aumenta ambas producciones. Por eso el punto está dentro de la FPP. En tu guía, B había que dibujarlo dentro, no sobre la curva.",
+ topic:"Curva de contrato y FPP", src:"Bloque 1 paso 6 · P2.3 · Clase 1, lám. 40"},
+{q:"Con p<sub>X</sub> = 2r<sup>1/2</sup>w<sup>1/2</sup> y p<sub>Y</sub> ∝ r<sup>1/4</sup>w<sup>3/4</sup>, si p<sub>X</sub> sube 10% y p<sub>Y</sub> no cambia:",
+ o:["%Δw = +10% y %Δr = −30%","%Δw = −10% y %Δr = +30%","%Δw = +5% y %Δr = +5%","%Δw = −30% y %Δr = +10%"], a:1,
+ hint:"Escribe %Δp = suma de participaciones × %Δ de cada factor. De la ecuación de Y (que no cambia) sale %Δr = −3·%Δw.",
+ why:"0 = 0,25%Δr + 0,75%Δw da %Δr = −3%Δw. Luego 10 = 0,5(−3%Δw) + 0,5%Δw = −%Δw, así que %Δw = −10% y %Δr = +30%. Ojo con el signo: lo perdiste una vez en la guía.",
+ topic:"Stolper–Samuelson en tasas de cambio", src:"Bloque 2 pasos 1–2 · P2.5"},
+{q:"¿Qué ordenamiento muestra el efecto magnificación del caso anterior?",
+ o:["%Δp<sub>X</sub> > %Δr > %Δw > %Δp<sub>Y</sub>","%Δr > %Δp<sub>X</sub> > %Δp<sub>Y</sub> > %Δw","%Δr = %Δp<sub>X</sub> > %Δw = %Δp<sub>Y</sub>","%Δw > %Δp<sub>Y</sub> > %Δp<sub>X</sub> > %Δr"], a:1,
+ hint:"El precio del factor intensivo en el bien que sube se mueve más que el propio precio del bien.",
+ why:"30% > 10% > 0% > −10%. El capital gana frente a ambos bienes y el trabajo pierde frente a ambos. Es un resultado del teorema, no una condición.",
+ topic:"Efecto magnificación", src:"Bloque 2 paso 3 · Clase 1, lám. 38–39"},
+{q:"En el diagrama de iso-costo unitario (w en el eje horizontal, r en el vertical), ¿qué curva es más empinada?",
+ o:["La del sector intensivo en capital","La del sector intensivo en trabajo","Ambas tienen la misma pendiente","Depende de los precios de los bienes"], a:1,
+ hint:"Si w sube, ¿qué sector necesita una caída más grande de r para mantener el costo igual al precio?",
+ why:"El sector intensivo en trabajo es más sensible a w: un alza de w le sube mucho el costo y r debe caer mucho para compensar. Por eso su curva es más empinada. En tu guía cruzaste las etiquetas una vez.",
+ topic:"Diagrama de iso-costo unitario", src:"Bloque 2, iso-costos · Clase 1, lám. 35–37 · P3.1"},
+{q:"Según Heckscher–Ohlin, un país abundante en capital, donde X es intensivo en capital, abre su comercio. ¿Qué ocurre?",
+ o:["p<sub>X</sub>/p<sub>Y</sub> cae, se importa X y gana el trabajo","p<sub>X</sub>/p<sub>Y</sub> sube, se exporta X, r sube y w cae","p<sub>X</sub>/p<sub>Y</sub> sube, se importa trabajo y w sube","No cambia nada si hay pleno empleo"], a:1,
+ hint:"En autarquía, el bien intensivo en el factor abundante es relativamente barato. ¿Qué le pasa a ese precio al enfrentar al resto del mundo?",
+ why:"El resto del mundo, abundante en L, tiene X caro. Al abrirse, p<sub>X</sub>/p<sub>Y</sub> sube, el país exporta X y por Stolper–Samuelson gana el factor abundante (K) y pierde el escaso (L). Se comercian bienes, no factores.",
+ topic:"Heckscher–Ohlin", src:"Bloque 2, H-O · Clase 1, lám. 41 · P3.2"},
+
+/* ---------- BLOQUE 2 ---------- */
+{q:"Con BT(Q) = −Q² + 15Q y costo de $3 por vaca, el planificador elige:",
+ o:["Q = 7,5 y renta 56,25","Q = 6 y renta 36","Q = 12 y renta 0","Q = 6 y renta 54"], a:1,
+ hint:"Maximiza la renta neta BN(Q) = BT(Q) − c·Q. Ojo: el costo total es c·Q, no c.",
+ why:"BN = −Q² + 12Q, CPO −2Q + 12 = 0, Q* = 6 y BN = −36 + 72 = 36. La segunda derivada es −2 < 0, así que es máximo. 54 sería el beneficio bruto sin restar costos.",
+ topic:"Óptimo del planificador", src:"Bloque 3 paso 1 · P4 a) · Clase 2, lám. 27–28"},
+{q:"En acceso abierto, ¿qué condición determina el número de vacas?",
+ o:["BMg(Q) = c","BP(Q) = c, donde BP = BT/Q","BT(Q) = 0","BMg(Q) = BP(Q)"], a:1,
+ hint:"Un ganadero nuevo mira lo que rinde SU vaca, que es el promedio del predio. Entra mientras eso supere su costo.",
+ why:"BP = −Q + 15 = 3 da Q = 12. Es una condición de libre entrada, no una CPO de un maximizador. La renta queda en 0.",
+ topic:"Acceso abierto", src:"Bloque 3 paso 2 · P4 b) · Clase 2, lám. 26–28"},
+{q:"¿Por qué en acceso abierto entran más vacas que en el óptimo?",
+ o:["Porque el costo por vaca es menor","Porque cada ganadero compara el beneficio promedio, que es mayor que el marginal","Porque el planificador no conoce BT","Porque hay rendimientos crecientes"], a:1,
+ hint:"Compara BP(Q) = −Q + 15 con BMg(Q) = −2Q + 15. ¿Cuál es mayor para Q > 0, y qué incluye uno que el otro no?",
+ why:"BMg = BP − (lo que la vaca nueva les quita a las demás). El ganadero ignora ese daño, por eso sigue entrando hasta disipar toda la renta. Esa disipación es la ineficiencia.",
+ topic:"BP vs. BMg y externalidad", src:"Bloque 3 paso 3 · P4 b)"},
+{q:"Con 6 vacas en el predio entra la séptima. ¿Cuánto pierden en total las 6 vacas que ya estaban?",
+ o:["1","3","6","8"], a:2,
+ hint:"BP(6) = 9 y BP(7) = 8. ¿Cuánto pierde cada vaca antigua, y cuántas son?",
+ why:"Cada una de las 6 vacas pierde 1, en total 6. La vaca 7 rinde 8 a su dueño, pero el predio solo sube 2 (de 54 a 56). La diferencia, 6, es la externalidad negativa.",
+ topic:"Medir la externalidad", src:"Bloque 3 paso 3 · P4 b)"},
+{q:"Con dos ganaderos, π₁ = −q₁² − q₁q₂ + 12q₁. ¿Cuál es la mejor respuesta del ganadero 1?",
+ o:["q₁ = 12 − q₂","q₁ = (12 − q₂)/2","q₁ = 6 − 2q₂","q₁ = (12 − 2q₂)/3"], a:1,
+ hint:"Deriva π₁ respecto de q₁, tratando q₂ como número fijo, iguala a cero y despeja.",
+ why:"∂π₁/∂q₁ = −2q₁ − q₂ + 12 = 0, así que q₁ = (12 − q₂)/2. Si q₂ = 0, pone 6, como el planificador.",
+ topic:"Función de mejor respuesta", src:"Bloque 3 paso 4 · P4 c) · Clase 2, lám. 35, 49–50"},
+{q:"¿Cuál es el equilibrio de Nash con dos ganaderos y la renta total?",
+ o:["3 y 3; renta 36","4 y 4; renta 32","6 y 6; renta 0","4,5 y 3; renta 33"], a:1,
+ hint:"Por simetría q₁ = q₂ = q. Reemplaza en q = (12 − q)/2.",
+ why:"2q = 12 − q, q = 4, Q = 8. Cada uno gana −16 − 16 + 48 = 16, renta total 32: entre el óptimo (36) y el acceso abierto (0).",
+ topic:"Equilibrio de Nash simétrico", src:"Bloque 3 paso 4 · P4 c)"},
+{q:"¿Por qué (3, 3) no es un equilibrio de Nash, aunque daría 18 a cada uno?",
+ o:["Porque 3 + 3 no es el óptimo","Porque si el otro pone 3, la mejor respuesta es 4,5: cada uno quiere desviarse","Porque el planificador lo prohíbe","Porque la renta total sería menor que 32"], a:1,
+ hint:"Un equilibrio de Nash exige que nadie quiera cambiarse dado lo que hace el otro. Evalúa la mejor respuesta a q₂ = 3.",
+ why:"q₁ = (12 − 3)/2 = 4,5 ≠ 3. Desviarse a 4 sube π₁ de 18 a 20. Es un dilema de los presos: el acuerdo conviene a ambos, pero a cada uno le conviene romperlo.",
+ topic:"Dilema de los presos", src:"Bloque 3 paso 5 · Clase 2, lám. 37–39"},
+{q:"¿Qué impuesto pigouviano τ por vaca lleva a los dos ganaderos al óptimo?",
+ o:["τ = 1","τ = 3","τ = 6","τ = 12"], a:1,
+ hint:"La CPO con impuesto es −2q₁ − q₂ + 12 − τ = 0. Impón q₁ = q₂ = 3 y despeja.",
+ why:"−6 − 3 + 12 − τ = 0, así que τ = 3. Y coincide con el daño externo: ∂π₂/∂q₁ = −q₂ = −3. El impuesto hace internalizar ese daño.",
+ topic:"Impuesto pigouviano", src:"Bloque 3 pasos 6–7 · P4 d) · Clase 2, lám. 6–9"},
+{q:"Con τ = 3, cada ganadero gana 9 y el Estado recauda 18. Comparado con el Nash sin impuesto (16 + 16):",
+ o:["La sociedad está peor, porque los ganaderos pierden 14 en total","La sociedad está mejor: el total sube de 32 a 36 y los 18 son una transferencia","Da lo mismo, porque la renta total no cambia","La sociedad pierde los 18 del impuesto"], a:1,
+ hint:"Suma ganaderos más Estado en cada caso. ¿La recaudación desaparece o cambia de manos?",
+ why:"9 + 9 + 18 = 36 > 32. La recaudación es una transferencia, no un costo social. Si el Estado devolviera 9 a cada uno en suma alzada, ambos tendrían 18 > 16.",
+ topic:"Eficiencia vs. distribución con Pigou", src:"Bloque 3, discusiones · P4 d)"},
+{q:"Sin Estado, con derechos de propiedad definidos y sin costos de transacción, ¿qué cambia si los derechos pasan del ganadero 1 al ganadero 2?",
+ o:["El número de vacas baja a 3","El número de vacas sube a 8","Siguen siendo 6 vacas; solo cambia quién se queda con los 36","Se vuelve al acceso abierto"], a:2,
+ hint:"El dueño, sea quien sea, se queda con toda la renta. ¿Qué cantidad maximiza la renta total?",
+ why:"Es el Teorema de Coase: la asignación de derechos no afecta la eficiencia (6 vacas) sino la distribución de la renta.",
+ topic:"Teorema de Coase", src:"Bloque 3 paso 8 · P4 e) · Clase 2, lám. 10–16"},
+
+/* ---------- BLOQUE 3 ---------- */
+{q:"Según Farrell (1987), ¿qué tienen en común el Primer Teorema del Bienestar y el Teorema de Coase?",
+ o:["Ambos requieren mercados competitivos completos","Ambos son resultados de descentralización: decisiones individuales llevan a la eficiencia","Ambos suponen información privada","Ambos justifican la intervención estatal"], a:1,
+ hint:"Farrell los agrupa bajo una misma etiqueta en la p. 114. ¿Qué dicen ambos sobre decisiones egoístas y eficiencia?",
+ why:"Ambos dicen que, bajo ciertas condiciones, las decisiones individuales llevan a resultados eficientes en el sentido de Pareto. Por eso son resultados de descentralización.",
+ topic:"Farrell: resultados de descentralización", src:"Farrell (1987), p. 114 · P1.5"},
+{q:"¿Qué supuesto usa Coase en lugar de la convexidad, los precios dados y los mercados completos del Teorema del Bienestar?",
+ o:["Que todos los agentes son idénticos","Que no se pierde ningún acuerdo mutuamente beneficioso","Que existe un subastador walrasiano","Que el gobierno conoce las preferencias"], a:1,
+ hint:"Farrell dice que Coase economiza en instituciones formales pero exige mucha coordinación. ¿Qué supone sobre la negociación?",
+ why:"Coase reemplaza los supuestos pesados por uno fuerte: ningún acuerdo beneficioso queda sin firmar. En mercados competitivos basta la acción unilateral; Coase exige acción conjunta.",
+ topic:"Farrell: unilateral vs. conjunta", src:"Farrell (1987), p. 114"},
+{q:"Para Farrell, ¿cuál es el principal obstáculo para que la negociación coasiana sea eficiente?",
+ o:["Que los derechos de propiedad no estén definidos","La información privada: cada parte sabe algo que la otra no","El número de bienes de la economía","La convexidad de las preferencias"], a:1,
+ hint:"Piensa en el comprador que valora una casa más que el vendedor, pero menos de lo que el vendedor cree que la valoran \"la mayoría\".",
+ why:"Con información privada, la negociación puede alargarse, ser costosa o fracasar. El resultado de Myerson–Satterthwaite muestra que ningún mecanismo voluntario garantiza siempre el acuerdo eficiente.",
+ topic:"Farrell: información privada", src:"Farrell (1987), pp. 114–115 y 117–121"},
+{q:"¿Qué concluye Farrell al comparar mercado y gobierno con su modelo del \"burócrata torpe\"?",
+ o:["El mercado siempre es superior","El gobierno siempre es superior","Una regla centralizada imperfecta puede dar más bienestar esperado que la negociación; hay que comparar cuál falla menos","Que el Teorema de Coase es falso"], a:2,
+ hint:"Farrell critica usar los teoremas de descentralización como prueba contra la intervención. ¿Qué hay que modelar para comparar?",
+ why:"Ninguno de los teoremas prueba que el mercado sea mejor que el gobierno; hay que modelar las imperfecciones de ambos. El resultado es ambiguo, y la elección entre Coase y Pigou depende de cuál falla menos.",
+ topic:"Farrell: burócrata torpe", src:"Farrell (1987), pp. 115–117 y 122–124"},
+{q:"Según Brawley (1997), ¿qué conflicto político predice cada modelo?",
+ o:["Stolper–Samuelson: sector contra sector. Factores específicos: clase contra clase","Stolper–Samuelson: factor contra factor (clases). Factores específicos: sector contra sector","Ambos predicen conflicto entre países","Ambos predicen conflicto entre partidos, no entre factores"], a:1,
+ hint:"Si los factores se mueven sin costo entre sectores, ¿importa en qué sector trabajas o qué factor posees?",
+ why:"Con movilidad total, cada factor tiene un solo retorno y el conflicto es entre factores. Si el capital está atado a su sector, capital y trabajo de un mismo sector se alían contra el otro sector.",
+ topic:"Brawley: modelos extremos", src:"Brawley (1997), pp. 633–637 · P1.4"},
+{q:"¿Cómo se relacionan Stolper–Samuelson, factores específicos y el modelo de factores parcialmente móviles?",
+ o:["Son modelos incompatibles","Son puntos de un mismo espectro de movilidad; el modelo parcialmente móvil contiene a los otros dos como casos extremos","El parcialmente móvil rechaza a los otros dos","Solo difieren en el número de bienes"], a:1,
+ hint:"Brawley sigue a Grossman (1983). ¿Qué variable cambia entre un modelo y otro?",
+ why:"La variable es la movilidad de los factores. Con movilidad total, el modelo de Grossman reproduce Stolper–Samuelson; con capital fijo, reproduce factores específicos. Brawley lo llama un refinamiento, no un rechazo.",
+ topic:"Brawley: el espectro de movilidad", src:"Brawley (1997), pp. 639–641 y 652"},
+{q:"En el ejemplo de la Alemania imperial, ¿qué fue la \"alianza del hierro y el centeno\"?",
+ o:["Una coalición librecambista de trabajadores y bancos","Una coalición proteccionista de los Junkers (agricultura) y la industria pesada desde 1879","El tratado de libre comercio de Caprivi","La alianza de socialdemócratas y liberales"], a:1,
+ hint:"El grano barato de EE.UU., Rusia y Argentina cambió la postura de los terratenientes. ¿Con quién se aliaron?",
+ why:"Los Junkers dejaron de ser competitivos y se volvieron proteccionistas, uniéndose a la industria pesada bajo Bismarck en 1879. La coalición librecambista fracasó con Caprivi (1890) y en 1909.",
+ topic:"Brawley: el caso alemán", src:"Brawley (1997), pp. 634, 638 y 649–651"},
+{q:"En el modelo de factores parcialmente móviles, ¿qué postura tiene el factor <strong>móvil y escaso</strong> frente al libre comercio?",
+ o:["Apoya el libre comercio","Apoya la protección","Ambigua: puede ganar empleo en el sector exportador, pero su retorno tiende a caer","Indiferente"], a:2,
+ hint:"El móvil abundante gana con la apertura y los específicos siguen a su sector. ¿Qué tensión enfrenta el móvil escaso?",
+ why:"Puede moverse al sector que se expande y ganar empleo, pero como factor escaso su retorno cae. Esos grupos ambiguos explican la inestabilidad de las coaliciones. En tu guía escribiste \"abundante\" aquí por error.",
+ topic:"Brawley: grupos ambiguos", src:"Brawley (1997), p. 641 · P1.4"},
+{q:"¿Por qué la apertura chilena aumentó la brecha salarial entre calificados y no calificados (Beyer, Rojas y Vergara, 1999)?",
+ o:["Porque Chile era abundante en trabajo calificado","Porque se desprotegieron sectores intensivos en trabajo no calificado (textil, calzado), cuyo precio relativo cayó","Porque subió el precio del cobre","Porque aumentó la oferta de universitarios"], a:1,
+ hint:"Aplica Stolper–Samuelson: ¿qué bienes bajaron de precio con la apertura y qué factor usan intensivamente?",
+ why:"Antes de la apertura, lo más protegido era intensivo en trabajo no calificado. Al caer su precio relativo, cayó el salario relativo del no calificado. La mayor oferta de universitarios, en cambio, redujo la brecha.",
+ topic:"Chile: skill premium", src:"Beyer, Rojas y Vergara (1999) · P1.2"},
+{q:"En Brasil (Gonzaga, Menezes y Terra, 2006), la brecha salarial por educación <strong>cayó</strong> con la apertura de 1988–1995. ¿Por qué mecanismo?",
+ o:["Los precios cayeron más en sectores intensivos en trabajo calificado, bajando su demanda relativa","Brasil subió sus aranceles","El cambio tecnológico favoreció a los no calificados","La apertura no afectó los precios"], a:0,
+ hint:"Es el mismo mecanismo que en Chile, pero mira qué sectores sufrieron las mayores bajas de precio en Brasil.",
+ why:"Los sectores intensivos en calificación eran los más expuestos a importaciones; al caer sus precios, cayó la demanda relativa por calificados. El cambio tecnológico sesgado empujó en contra y atenuó la caída.",
+ topic:"Brasil: skill premium", src:"Gonzaga, Menezes y Terra (2006) · P1.2"}
+];
+
+/* Reordena las alternativas de forma fija por pregunta, para que la correcta no caiga siempre en la misma letra */
+Q.forEach((q,i)=>{
+  let s = (i+1)*9301 + 49297;
+  const rnd = ()=>{ s = (s*9301 + 49297) % 233280; return s/233280; };
+  const idx = q.o.map((_,k)=>k);
+  for(let k=idx.length-1;k>0;k--){ const j=Math.floor(rnd()*(k+1)); [idx[k],idx[j]]=[idx[j],idx[k]]; }
+  q.o = idx.map(k=>q.o[k]);
+  q.a = idx.indexOf(q.a);
+});
+
+/* Materia teórica: cada lección precede a una o dos preguntas */
+const LESSONS = [
+{t:"Tasa marginal de sustitución técnica (TMST)",
+ e:"La TMST mide cuántas unidades de capital puede ahorrar un sector si contrata un trabajador más, sin cambiar su producción. Es la pendiente de la isocuanta.",
+ w:"Cada firma compara esa tasa con lo que cuestan los factores. Si un trabajador reemplaza más capital del que cuesta en relación al capital (TMST > w/r), le conviene contratar más trabajo. Por eso en el óptimo de la firma la TMST se iguala a w/r.",
+ f:"TMST = PMg<sub>L</sub> / PMg<sub>K</sub> &nbsp;·&nbsp; con K<sup>a</sup>L<sup>b</sup>: TMST = (b/a)·(K/L)",
+ k:["En Cobb-Douglas la TMST es <strong>proporcional</strong> a K/L, no igual (salvo que a = b).","El factor (b/a) viene de los exponentes: el de L arriba y el de K abajo.","Una TMST más alta significa que en ese sector un trabajador “vale” más capital."],
+ s:"Clase 1, lám. 21–27 · MWG 5.C p. 135"},
+{t:"Intensidad factorial",
+ e:"Un bien es intensivo en capital si, enfrentando los mismos precios de factores, usa más capital por trabajador que el otro bien.",
+ w:"La comparación se hace al mismo w/r porque ambos sectores contratan en los mismos mercados de factores. En Cobb-Douglas, la razón K/L de cada sector es una fracción fija de w/r, así que el orden entre sectores nunca se invierte, sea cual sea w/r.",
+ f:"TMST = w/r ⇒ K/L = (a/b)·(w/r)",
+ k:["En tu guía: K<sub>X</sub>/L<sub>X</sub> = w/r y K<sub>Y</sub>/L<sub>Y</sub> = (w/r)/3.","Si el enunciado dice “cualquiera sea w/r”, se prueba con una desigualdad general; los ejemplos solo ilustran.","Bienes son intensivos en factores; países son abundantes en factores. No los mezcles."],
+ s:"Clase 1, lám. 24 y 30 · P2.1"},
+{t:"Eficiencia en producción",
+ e:"Una asignación de factores es eficiente si no se puede producir más de un bien sin producir menos del otro. La condición es TMST<sub>X</sub> = TMST<sub>Y</sub>.",
+ w:"Si las TMST difieren, un trabajador “vale” distinta cantidad de capital en cada sector. Llevando trabajo hacia donde vale más capital, y llevando ese capital al otro sector, ambos sectores producen más. Es como un intercambio con ganancias para los dos lados.",
+ k:["Si TMST<sub>X</sub> &lt; TMST<sub>Y</sub>: el trabajo va a Y y el capital va a X.","En A = (50, 50): TMST<sub>X</sub> = 1 y TMST<sub>Y</sub> = 3, así que A no es eficiente.","Pasar a B = (62, 42) sube X de 50 a 51,03 e Y de 50 a 52,18: una mejora de Pareto."],
+ s:"Clase 1, lám. 22 y 31 · P2.3"},
+{t:"Curva de contrato y frontera de posibilidades de producción",
+ e:"La curva de contrato reúne todas las asignaciones eficientes dentro de la caja de Edgeworth. La FPP es esa misma curva traducida a cantidades de bienes.",
+ w:"Cada punto eficiente da el máximo de Y posible para un X dado, por eso traza la frontera. Un punto fuera de la curva de contrato desperdicia factores y queda dentro de la FPP. La FPP es cóncava porque los sectores tienen distinta intensidad: al especializarse, el sector que crece recibe factores que le rinden cada vez menos.",
+ f:"K<sub>X</sub> = 300 L<sub>X</sub> / (100 + 2L<sub>X</sub>)",
+ k:["Pasa por ambos orígenes: L<sub>X</sub> = 0 da K<sub>X</sub> = 0 y L<sub>X</sub> = 100 da K<sub>X</sub> = 100.","Sobre la diagonal ⇔ K<sub>X</sub> > L<sub>X</sub>: el sector intensivo en K se queda con proporcionalmente más capital.","Pendiente de la FPP = CMg<sub>X</sub>/CMg<sub>Y</sub>; en equilibrio competitivo, igual a p<sub>X</sub>/p<sub>Y</sub>."],
+ s:"Clase 1, lám. 28–31 y 40 · MWG 15.D p. 529 · P2.2–P2.3"},
+{t:"Teorema de Stolper–Samuelson",
+ e:"Si sube el precio relativo de un bien, sube el retorno real del factor que ese bien usa intensivamente y cae el retorno real del otro factor.",
+ w:"Con competencia y retornos constantes, cada precio es igual a su costo unitario. Si p<sub>X</sub> sube y p<sub>Y</sub> no, el factor intensivo en X debe encarecerse para que el costo de X alcance a su precio, y como el costo de Y no puede subir, el otro factor debe abaratarse. Como cada precio es un promedio ponderado de los precios de los factores, el que sube debe subir más que el propio bien: es el efecto magnificación.",
+ f:"%Δp<sub>X</sub> = θ<sub>K</sub>·%Δr + θ<sub>L</sub>·%Δw &nbsp;(θ = participación en el costo = exponente en Cobb-Douglas)",
+ k:["Despeja primero con el bien cuyo precio no cambia: eso da la relación entre %Δr y %Δw.","Magnificación: el factor ganador sube más que ambos bienes y el perdedor baja más que ambos.","Ganan o pierden <strong>factores</strong>, no bienes ni sectores."],
+ s:"Clase 1, lám. 38–40 · MWG 15.D · P2.5"},
+{t:"Diagrama de iso-costo unitario",
+ e:"Cada sector tiene una curva con las combinaciones (w, r) que hacen su costo unitario igual a su precio. Los precios de equilibrio de los factores están donde se cruzan.",
+ w:"Fuera del cruce, un sector tiene costo menor a su precio y se expande, y el otro tiene pérdidas y se contrae. El que se expande demanda sobre todo su factor intensivo, lo que sube ese precio, y el que se contrae libera el otro factor, lo que baja su precio. Así (w, r) vuelve al cruce. La pendiente refleja la intensidad: el sector intensivo en trabajo es el más sensible a w.",
+ k:["Con w en el eje horizontal, la curva más empinada es la del sector intensivo en trabajo.","Bajo la curva de un sector, su costo es menor que su precio: tiene ganancias y se expande.","Con precios de bienes fijos, las curvas no se mueven; se mueve el punto (w, r)."],
+ s:"Clase 1, lám. 35–37 · P3.1"},
+{t:"Modelo de Heckscher–Ohlin",
+ e:"Un país exporta el bien que usa intensivamente su factor abundante e importa el que usa su factor escaso.",
+ w:"En autarquía, el factor abundante es barato, así que el bien que lo usa intensivamente también lo es. Al abrirse, ese precio sube hacia el mundial, el país produce más de ese bien y, por Stolper–Samuelson, sube el retorno del factor abundante y cae el del escaso. El comercio de bienes funciona como un intercambio indirecto de factores.",
+ k:["Cadena: abundancia → precio relativo bajo en autarquía → la apertura sube ese precio → la producción se mueve por la FPP → gana el factor abundante y pierde el escaso.","El consumo se separa de la producción.","Se comercian bienes, no factores: no se “importa trabajo”."],
+ s:"Clase 1, lám. 41 · P3.2"},
+{t:"Óptimo del planificador en un recurso común",
+ e:"El uso óptimo de un predio maximiza su renta neta: el beneficio total menos el costo total de las vacas.",
+ w:"El planificador mira el predio completo. Agrega vacas mientras la última sume más de lo que cuesta. Así toma en cuenta los dos efectos de cada vaca: lo que produce ella y lo que reduce la producción de las demás.",
+ f:"máx BN(Q) = BT(Q) − c·Q &nbsp;⇒&nbsp; BT′(Q) = c",
+ k:["El costo total es c·Q, no c.","La CSO (BN″ &lt; 0) confirma que es un máximo.","En P4: BN = −Q² + 12Q, Q* = 6, renta 36."],
+ s:"Clase 2, lám. 26–28 · P4 a)"},
+{t:"Acceso abierto y tragedia de los comunes",
+ e:"Si nadie es dueño y la entrada es libre, cada ganadero entra mientras lo que rinde su vaca, que es el beneficio promedio, supere su costo.",
+ w:"Quien entra se lleva el beneficio promedio de una vaca, pero no paga por el pasto que les quita a las demás. Como el beneficio promedio es mayor que el marginal, siguen entrando vacas hasta que el promedio iguala al costo. En ese punto la renta total es cero: se disipa por completo.",
+ f:"BP(Q) = BT(Q)/Q = c",
+ k:["Es una condición de libre entrada, no una CPO.","BP − BMg = lo que la vaca nueva les quita a las demás.","La disipación total de la renta es la ineficiencia, no una ausencia de ella."],
+ s:"Clase 2, lám. 26–28 · P4 b)"},
+{t:"Qué es una externalidad y cómo se mide",
+ e:"Hay una externalidad cuando la acción de un agente afecta directamente el bienestar o la producción de otro, sin pasar por los precios (MWG, Def. 11.B.1).",
+ w:"En el predio, la vaca nueva baja directamente lo que rinden todas las demás. Ese daño no lo paga quien trae la vaca, por eso la decisión privada se aparta del óptimo. Se mide dejando fijas las vacas de los demás y viendo cuánto cae lo que ellas producen.",
+ k:["Daño = caída del beneficio por vaca × número de vacas afectadas.","Una externalidad pecuniaria (efecto vía precios) no genera ineficiencia; una tecnológica sí.","Es la base de las soluciones de Pigou y de Coase."],
+ s:"MWG 11.B p. 351–352 · Clase 2, lám. 3–5"},
+{t:"Mejor respuesta y equilibrio de Nash",
+ e:"En un equilibrio de Nash, cada jugador elige lo mejor dado lo que hace el otro, y nadie quiere cambiar su decisión.",
+ w:"Con dos ganaderos, cada uno sí considera el daño que una vaca extra causa a sus propias vacas, pero no el que causa a las del otro. Por eso ponen menos vacas que en acceso abierto y más que en el óptimo.",
+ f:"Mejor respuesta: ∂π<sub>i</sub>/∂q<sub>i</sub> = 0 con q<sub>j</sub> fijo",
+ k:["La ganancia de cada uno usa el BP del total: π₁ = q₁·BP(q₁ + q₂) − c·q₁.","El Nash está donde se cruzan las dos funciones de mejor respuesta.","Si los jugadores son simétricos, en equilibrio q₁ = q₂."],
+ s:"Clase 2, lám. 35 y 49–50 · Nicholson cap. 12 pp. 353–357 · P4 c)"},
+{t:"Dilema de los presos",
+ e:"Es un juego en que ambos jugadores estarían mejor cooperando, pero a cada uno le conviene desviarse si el otro coopera.",
+ w:"El acuerdo es mejor para ambos que el equilibrio de Nash, pero no es una mejor respuesta: dado que el otro cumple, romper el acuerdo paga más. Sin algo que castigue la desviación, como un juego repetido o un contrato, el acuerdo no se sostiene.",
+ k:["Un equilibrio de Nash no tiene por qué ser Pareto eficiente.","Para saber si un acuerdo es Nash, evalúa la mejor respuesta de cada jugador en ese acuerdo.","En juegos repetidos (clase 3) la cooperación puede sostenerse con amenazas de castigo."],
+ s:"Clase 2, lám. 37–39 · Nicholson pp. 358–361"},
+{t:"Impuesto pigouviano",
+ e:"Un impuesto por unidad igual al daño marginal que esa unidad causa a terceros hace que el agente internalice la externalidad.",
+ w:"Con el impuesto, el costo privado de una vaca pasa a ser igual a su costo social. Entonces la decisión privada coincide con la del planificador. La recaudación no se pierde: es una transferencia de los ganaderos al Estado.",
+ k:["τ = daño marginal evaluado en el óptimo.","El Estado necesita conocer BT y el tamaño de la externalidad: es la principal limitación de Pigou.","Eficiencia (cuánto se produce) y distribución (quién se queda con qué) son preguntas distintas."],
+ s:"Clase 2, lám. 6–9 · MWG 11.B p. 351 · P4 d)"},
+{t:"Teorema de Coase",
+ e:"Con derechos de propiedad bien definidos y sin costos de transacción, la negociación lleva al resultado eficiente, sin importar a quién se asignen los derechos.",
+ w:"El dueño del recurso se queda con toda la renta, ya sea usándolo él o cobrando arriendo. Por eso le conviene maximizarla, y al hacerlo internaliza todo el daño. La asignación de derechos solo decide quién se queda con la renta.",
+ k:["La eficiencia no depende de quién tenga el derecho.","La distribución sí depende.","Ejemplo de clase: minera y comunidades, con el derecho en una u otra parte."],
+ s:"Clase 2, lám. 10–16 · P4 e)"},
+{t:"Farrell: dos resultados de descentralización",
+ e:"Farrell (1987) presenta el Teorema de Coase como un resultado de descentralización, igual que el Primer Teorema del Bienestar.",
+ w:"Ambos dicen que decisiones individuales egoístas llevan a la eficiencia si todo es transable. Difieren en los supuestos. El Teorema del Bienestar exige mercados competitivos completos, convexidad y precios dados; ahí basta la acción unilateral de cada agente. Coase prescinde de eso, pero supone que ningún acuerdo beneficioso queda sin hacerse, lo que exige negociar y coordinarse.",
+ k:["Coase economiza en instituciones formales, pero exige mucha coordinación.","Mercados competitivos: acción unilateral. Coase: acción conjunta.","Por eso Coase es más ambicioso: sugeriría que ni el monopolio ni los bienes públicos son problema."],
+ s:"Farrell (1987), pp. 113–114 · P1.5"},
+{t:"Farrell: información privada y el burócrata torpe",
+ e:"Con información privada, la negociación voluntaria no garantiza la eficiencia, pero eso no prueba que el gobierno lo haga mejor.",
+ w:"Si cada parte esconde cuánto valora el acuerdo para conseguir un mejor precio, acuerdos que convenían a ambos se demoran o no se firman. Myerson–Satterthwaite muestra que ningún mecanismo voluntario evita esto siempre. Pero el gobierno tampoco conoce las valoraciones privadas: el modelo del burócrata torpe muestra que una regla centralizada puede ser mejor o peor, según el caso.",
+ k:["Hay que modelar las imperfecciones del mercado y del gobierno antes de elegir.","Ninguno de los dos teoremas prueba que el laissez-faire sea mejor que la intervención (p. 116).","Hayek: descentralizar es delegar decisiones en quien sabe más; el subastador walrasiano no lo es."],
+ s:"Farrell (1987), pp. 114–124 · P4 e)"},
+{t:"Movilidad factorial y conflicto político",
+ e:"El tipo de conflicto político que genera el comercio depende de cuán fácil es mover los factores entre sectores.",
+ w:"Si un factor se mueve libremente, su ingreso depende de qué factor es (capital o trabajo), no del sector donde está: el conflicto es de clases, como en Stolper–Samuelson. Si está atado a su sector, su ingreso depende de la suerte de ese sector: el conflicto es sectorial, como en el modelo de factores específicos. La realidad suele estar entre los dos.",
+ k:["Stolper–Samuelson: movilidad total, largo plazo, factor contra factor (Rogowski).","Factores específicos (Ricardo–Viner, SSK): capital fijo, corto plazo, sector contra sector (Frieden).","Grossman (1983): cada unidad de capital tiene un costo de ajuste distinto, lo que da un espectro entre ambos extremos."],
+ s:"Brawley (1997), pp. 633–641 · P1.4"},
+{t:"Brawley: factores parcialmente móviles en la Alemania imperial",
+ e:"Brawley divide cada factor en una parte móvil y partes específicas a cada sector, y con eso explica por qué en Alemania la protección persistió.",
+ w:"Los factores específicos siguen a su sector. El factor móvil abundante apoya el libre comercio, porque puede ir al sector que se expande. El móvil escaso queda en una posición ambigua: gana empleo pero pierde retorno. Esos grupos ambiguos hicieron imposible armar una coalición librecambista estable.",
+ k:["1879: Bismarck forma la coalición proteccionista entre Junkers e industria pesada, tras la llegada de grano barato.","La coalición librecambista fracasó dos veces: con Caprivi (1890) y en 1909.","Conclusión: algunos actores estaban en conflicto sectorial y otros en conflicto factorial."],
+ s:"Brawley (1997), pp. 634, 638, 641, 647 y 651–652"},
+{t:"Apertura comercial y skill premium",
+ e:"La apertura cambia el salario relativo entre calificados y no calificados a través de los precios relativos de los bienes: es Stolper–Samuelson con dos tipos de trabajo como factores.",
+ w:"Si con la apertura caen los precios de bienes intensivos en trabajo no calificado, cae su salario relativo y la brecha sube. Si caen los de bienes intensivos en calificación, la brecha baja. El resultado depende de qué precios cambian, no de una regla fija para “países en desarrollo”. También pesan la oferta de educación y el cambio tecnológico sesgado.",
+ k:["“Mecanismo” = la cadena: apertura → precios relativos → demanda relativa por calificación → skill premium.","Chile (Beyer, Rojas y Vergara, 1999): se desprotegieron sectores intensivos en no calificado, como textil y calzado.","Brasil (Gonzaga, Menezes y Terra, 2006): aranceles de 42,6% a 13,4% entre 1988 y 1995; los precios cayeron más en sectores intensivos en calificación."],
+ s:"Beyer y otros (1999) · Gonzaga y otros (2006) · P1.2"}
+];
+const QL = [0,0,1,2,3,3,4,4,5,6, 7,8,8,9,10,10,11,12,12,13, 14,14,15,15,16,16,17,17,18,18];
+
+function lessonHTML(L){
+  const l = LESSONS[L];
+  return `<div class="ls-sec"><h4>La esencia</h4><p>${l.e}</p></div>
+    <div class="ls-sec"><h4>Por qué</h4><p>${l.w}</p></div>
+    ${l.f?`<div class="formula">${l.f}</div>`:""}
+    <div class="ls-sec"><h4>Puntos clave</h4><ul>${l.k.map(x=>`<li>${x}</li>`).join("")}</ul></div>
+    <p class="src">Fuente: ${l.s}</p>`;
+}
+
+const KEY = "ensayo-micro-v2";
+const LETTERS = ["A","B","C","D"];
+let st = load() || fresh();
+
+function fresh(){ return {i:0, res:Array(Q.length).fill(null), tries:Array(Q.length).fill(0), picks:Array(Q.length).fill(null).map(()=>[]), seen:Array(LESSONS.length).fill(false), summary:null}; }
+function load(){ try{ const s = JSON.parse(localStorage.getItem(KEY)); if(s && s.res && s.res.length===Q.length && s.seen && s.seen.length===LESSONS.length) return s; }catch(e){} return null; }
+function save(){ try{ localStorage.setItem(KEY, JSON.stringify(st)); }catch(e){} }
+
+const stage = document.getElementById("stage");
+const blocksEl = document.getElementById("blocks");
+
+function blockOf(i){ return Math.floor(i/10); }
+
+function renderBlocks(){
+  const cur = st.summary!==null ? st.summary : blockOf(st.i);
+  blocksEl.innerHTML = BLOCKS.map((b,bi)=>{
+    const dots = Array.from({length:10},(_,k)=>{
+      const idx = bi*10+k, r = st.res[idx];
+      const cls = r==="c1"?"c1":r==="c2"?"c2":r==="x"?"x":"";
+      const now = (st.summary===null && idx===st.i) ? " now":"";
+      return `<span class="dot ${cls}${now}" title="Pregunta ${idx+1}"></span>`;
+    }).join("");
+    const done = st.res.slice(bi*10,bi*10+10).filter(Boolean).length;
+    return `<div class="blk${bi===cur?" on":""}"><b>${b.name}</b><span>${b.title} · ${done}/10</span><div class="dots">${dots}</div></div>`;
+  }).join("");
+}
+
+function render(){
+  renderBlocks();
+  if(st.summary!==null) return renderSummary(st.summary);
+  if(st.i>=Q.length) return renderFinal();
+  renderQuestion();
+}
+
+function renderLesson(L){
+  const i = st.i;
+  const qs = QL.map((l,k)=>l===L?k:-1).filter(k=>k>=0);
+  const nq = qs.length===1 ? "1 pregunta" : `${qs.length} preguntas`;
+  stage.innerHTML = `<section class="card lesson">
+    <div class="qmeta"><span>${BLOCKS[blockOf(i)].name} · Materia ${L+1} de ${LESSONS.length}</span><span>Luego: ${nq}</span></div>
+    <div class="eyebrow">Materia teórica</div>
+    <h2>${LESSONS[L].t}</h2>
+    ${lessonHTML(L)}
+    <div class="actions">
+      ${i%10>0 ? `<button class="btn ghost" id="prev">Anterior</button>`:""}
+      <button class="btn" id="golesson">Ir a la pregunta</button>
+    </div>
+  </section>`;
+  document.getElementById("golesson").addEventListener("click",()=>{ st.seen[L]=true; save(); render(); window.scrollTo({top:0}); });
+  const pv = document.getElementById("prev");
+  if(pv) pv.addEventListener("click",()=>{ st.i=i-1; save(); render(); });
+}
+
+function renderQuestion(){
+  const i = st.i, q = Q[i], r = st.res[i], picks = st.picks[i];
+  const L = QL[i];
+  if(!st.seen[L]) return renderLesson(L);
+  const answered = r!==null;
+  const opts = q.o.map((t,k)=>{
+    let cls = "";
+    if(picks.includes(k) && k!==q.a) cls="wrong";
+    if(answered && k===q.a) cls="right";
+    if(answered && !picks.includes(k) && k!==q.a) cls="dim";
+    const dis = answered || picks.includes(k) ? "disabled" : "";
+    return `<button class="opt ${cls}" id="opt-${i}-${k}" data-k="${k}" ${dis}><span class="k">${LETTERS[k]}</span><span>${t}</span></button>`;
+  }).join("");
+
+  let fb = "";
+  if(r==="c1") fb = `<div class="fb ok" role="status"><h3>Correcto al primer intento</h3><p>${q.why}</p><p class="src">${q.src}</p></div>`;
+  else if(r==="c2") fb = `<div class="fb ok" role="status"><h3>Correcto con la pista</h3><p>${q.why}</p><p class="src">Repásalo igual: ${q.src}</p></div>`;
+  else if(r==="x") fb = `<div class="fb bad" role="status"><h3>La respuesta correcta era ${LETTERS[q.a]}</h3><p>${q.why}</p><p class="src">Dónde estudiarlo: ${q.src}</p></div>`;
+  else if(picks.length===1) fb = `<div class="fb hint" role="status"><h3>No es esa. Una pista antes del segundo intento</h3><p>${q.hint}</p></div>`;
+
+  const last = (i%10===9);
+  stage.innerHTML = `<section class="card">
+    <div class="qmeta"><span>${BLOCKS[blockOf(i)].name} · Pregunta ${i%10+1} de 10</span><span>${q.topic}</span></div>
+    <details class="recall" id="recall-${i}"><summary>Volver a ver la materia: ${LESSONS[L].t}</summary><div class="recall-body">${lessonHTML(L)}</div></details>
+    <p class="qtext">${q.q}</p>
+    <div class="opts">${opts}</div>
+    ${fb}
+    <div class="actions">
+      ${i%10>0 ? `<button class="btn ghost" id="prev">Anterior</button>`:""}
+      <button class="btn" id="next" ${answered?"":"disabled"}>${last?"Ver resumen del bloque":"Siguiente pregunta"}</button>
+    </div>
+  </section>`;
+
+  stage.querySelectorAll(".opt").forEach(b=>b.addEventListener("click",()=>pick(+b.dataset.k)));
+  const nx = document.getElementById("next");
+  nx.addEventListener("click",()=>{ if(last){ st.summary=blockOf(i); } st.i = i+1; save(); render(); window.scrollTo({top:0}); });
+  const pv = document.getElementById("prev");
+  if(pv) pv.addEventListener("click",()=>{ st.i=i-1; save(); render(); });
+}
+
+function pick(k){
+  const i = st.i, q = Q[i];
+  if(st.res[i]!==null || st.picks[i].includes(k)) return;
+  st.picks[i].push(k);
+  st.tries[i]++;
+  if(k===q.a) st.res[i] = st.tries[i]===1 ? "c1" : "c2";
+  else if(st.tries[i]>=2) st.res[i] = "x";
+  save(); render();
+  const fb = stage.querySelector(".fb"); if(fb) fb.scrollIntoView({block:"nearest"});
+}
+
+function counts(from,to){
+  const s = st.res.slice(from,to);
+  return {c1:s.filter(x=>x==="c1").length, c2:s.filter(x=>x==="c2").length, x:s.filter(x=>x==="x").length};
+}
+function pts(c){ return c.c1 + 0.5*c.c2; }
+
+function studyList(from,to){
+  const items = [];
+  for(let i=from;i<to;i++){
+    const r = st.res[i]; if(r!=="c2" && r!=="x") continue;
+    const q = Q[i];
+    items.push(`<li><span class="tag ${r}">${r==="x"?"Incorrecta":"Con pista"} · P${i+1}</span><b>${q.topic}</b><span>${q.why}</span><span class="src">Repasar: ${q.src}</span></li>`);
+  }
+  return items;
+}
+
+function verdict(p,n){
+  const pct = p/n;
+  if(pct>=0.9) return "Dominas este bloque. Repasa solo lo marcado abajo.";
+  if(pct>=0.7) return "Buen nivel. Los puntos marcados abajo son lo que te separa del dominio.";
+  if(pct>=0.5) return "Base aceptable, con vacíos claros. Repasa cada tema marcado antes de seguir.";
+  return "Este bloque necesita una vuelta completa. Relee la guía de estudio y vuelve a intentarlo.";
+}
+
+function renderSummary(b){
+  const c = counts(b*10,b*10+10), p = pts(c);
+  const items = studyList(b*10,b*10+10);
+  const isLast = b===BLOCKS.length-1;
+  stage.innerHTML = `<section class="card sum">
+    <div class="qmeta"><span>Resumen · ${BLOCKS[b].name}</span><span>${BLOCKS[b].title}</span></div>
+    <div class="big">${fmt(p)}<small> / 10 puntos</small></div>
+    <p style="margin:0">${verdict(p,10)}</p>
+    <div class="score">
+      <span class="pill c1">${c.c1} al primer intento</span>
+      <span class="pill c2">${c.c2} con pista</span>
+      <span class="pill x">${c.x} incorrectas</span>
+    </div>
+    <h2>Qué estudiar para mejorar</h2>
+    ${items.length ? `<ul class="study">${items.join("")}</ul>` : `<p style="margin:0">Respondiste todo al primer intento. Nada pendiente en este bloque.</p>`}
+    <p class="src" style="margin:0">Puntaje: 1 punto al primer intento, 0,5 con pista, 0 si fallas ambos.</p>
+    <div class="actions">
+      <button class="btn ghost" id="redo">Repetir este bloque</button>
+      <button class="btn" id="go">${isLast?"Ver resultado final":"Empezar "+BLOCKS[b+1].name}</button>
+    </div>
+  </section>`;
+  document.getElementById("go").addEventListener("click",()=>{ st.summary=null; save(); render(); window.scrollTo({top:0}); });
+  document.getElementById("redo").addEventListener("click",()=>resetBlock(b));
+}
+
+function renderFinal(){
+  const c = counts(0,Q.length), p = pts(c);
+  const per = BLOCKS.map((bl,b)=>{ const cb=counts(b*10,b*10+10); return `<li><b>${bl.name}: ${fmt(pts(cb))} / 10</b><span>${bl.title} · ${cb.c1} directas, ${cb.c2} con pista, ${cb.x} incorrectas</span></li>`; }).join("");
+  const items = studyList(0,Q.length);
+  stage.innerHTML = `<section class="card sum">
+    <div class="qmeta"><span>Resultado final</span><span>30 preguntas</span></div>
+    <div class="big">${fmt(p)}<small> / 30 puntos · ${Math.round(p/30*100)}%</small></div>
+    <p style="margin:0">${verdict(p,30)}</p>
+    <ul class="study">${per}</ul>
+    <h2>Plan de repaso</h2>
+    ${items.length ? `<ul class="study">${items.join("")}</ul>` : `<p style="margin:0">Sin errores. Pasa a los temas pendientes del curso: juegos dinámicos (clase 3), Stackelberg, juegos repetidos e información asimétrica.</p>`}
+    <p style="margin:0">Además de lo marcado, la guía de estudio lista temas del examen que este ensayo no cubre: clase 3 (juegos dinámicos, Stackelberg, juegos repetidos), Cournot y Bertrand, bienes públicos e información asimétrica.</p>
+    <div class="actions"><button class="btn" id="all">Empezar de nuevo</button></div>
+  </section>`;
+  document.getElementById("all").addEventListener("click",()=>{ st=fresh(); save(); render(); window.scrollTo({top:0}); });
+}
+
+function resetBlock(b){
+  for(let i=b*10;i<b*10+10;i++){ st.res[i]=null; st.tries[i]=0; st.picks[i]=[]; st.seen[QL[i]]=false; }
+  st.i=b*10; st.summary=null; save(); render(); window.scrollTo({top:0});
+}
+function fmt(n){ return Number.isInteger(n)? String(n) : n.toFixed(1).replace(".",","); }
+
+render();
+</script>
+
+</body>
+</html>
